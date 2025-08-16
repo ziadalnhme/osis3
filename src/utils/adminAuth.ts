@@ -91,12 +91,7 @@ export const saveUploadedImage = (file: File): Promise<string> => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const imageData = e.target?.result as string;
-      // في البيئة الحقيقية، يجب رفع الصورة إلى خادم
-      // هنا نحفظها كـ base64 في localStorage
-      const imageId = Date.now().toString();
-      const images = JSON.parse(localStorage.getItem('uploadedImages') || '{}');
-      images[imageId] = imageData;
-      localStorage.setItem('uploadedImages', JSON.stringify(images));
+      // إرجاع البيانات مباشرة بدون حفظ في localStorage لتجنب تجاوز الحد المسموح
       resolve(imageData);
     };
     reader.readAsDataURL(file);
@@ -105,8 +100,8 @@ export const saveUploadedImage = (file: File): Promise<string> => {
 
 // الحصول على الصورة المحفوظة
 export const getUploadedImage = (imageId: string): string | null => {
-  const images = JSON.parse(localStorage.getItem('uploadedImages') || '{}');
-  return images[imageId] || null;
+  // لا نحتاج هذه الوظيفة بعد الآن لأننا لا نحفظ الصور في localStorage
+  return null;
 };
 
 // حفظ بيانات المحتوى

@@ -157,57 +157,8 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loadedClientLogos, setLoadedClientLogos] = React.useState(clientLogos);
 
   React.useEffect(() => {
-    // تحميل البيانات المحفوظة من localStorage
-    const savedDesignWorks = localStorage.getItem('content_designWorks');
-    const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
-    const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
-    const savedClientLogos = localStorage.getItem('content_clientLogos');
-
-    if (savedDesignWorks) {
-      try {
-        const parsedDesignWorks = JSON.parse(savedDesignWorks);
-        setLoadedDesignCategories(parsedDesignWorks.map((work: any) => ({
-          ...work,
-          icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
-        })));
-      } catch (error) {
-        console.error('خطأ في تحميل أعمال التصميم:', error);
-      }
-    }
-
-    if (savedSupervisionWorks) {
-      try {
-        const parsedSupervisionWorks = JSON.parse(savedSupervisionWorks);
-        setLoadedSupervisionCategories(parsedSupervisionWorks.map((work: any) => ({
-          ...work,
-          icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
-        })));
-      } catch (error) {
-        console.error('خطأ في تحميل أعمال الإشراف:', error);
-      }
-    }
-
-    if (savedFeaturedProjects) {
-      try {
-        setLoadedProjectsGallery(JSON.parse(savedFeaturedProjects));
-      } catch (error) {
-        console.error('خطأ في تحميل المشاريع المميزة:', error);
-      }
-    }
-
-    if (savedClientLogos) {
-      try {
-        setLoadedClientLogos(JSON.parse(savedClientLogos));
-      } catch (error) {
-        console.error('خطأ في تحميل شعارات العملاء:', error);
-      }
-    }
-  }, []);
-
-  // إعادة تحميل البيانات عند تغيير localStorage
-  React.useEffect(() => {
-    const handleStorageChange = () => {
-      // إعادة تحميل البيانات عند تغييرها
+    // دالة تحميل البيانات
+    const loadData = () => {
       const savedDesignWorks = localStorage.getItem('content_designWorks');
       const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
       const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
@@ -253,22 +204,29 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         }
       }
     };
+    
+    // تحميل البيانات عند بدء التشغيل
+    loadData();
+    
+    // مراقبة تغييرات localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key && e.key.startsWith('content_')) {
+        loadData();
+      }
+    };
+    
+    // مراقبة الأحداث المخصصة
+    const handleContentUpdate = () => {
+      loadData();
+    };
 
     // مراقبة تغييرات localStorage
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('contentUpdated', handleContentUpdate);
     
-    // مراقبة التغييرات في نفس التبويب
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = function(key, value) {
-      originalSetItem.apply(this, [key, value]);
-      if (key.startsWith('content_')) {
-        handleStorageChange();
-      }
-    };
-
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      localStorage.setItem = originalSetItem;
+      window.removeEventListener('contentUpdated', handleContentUpdate);
     };
   }, []);
 

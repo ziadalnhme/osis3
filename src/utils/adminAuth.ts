@@ -106,7 +106,87 @@ export const getUploadedImage = (imageId: string): string | null => {
 
 // حفظ بيانات المحتوى
 export const saveContentData = (key: string, data: any): void => {
-  localStorage.setItem(`content_${key}`, JSON.stringify(data));
+  try {
+    // تنظيف البيانات من الصور الكبيرة قبل الحفظ
+    const cleanedData = cleanDataForStorage(data);
+    localStorage.setItem(`content_${key}`, JSON.stringify(cleanedData));
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.warn('تجاوز حد التخزين المحلي، سيتم حفظ البيانات بدون الصور');
+      // حفظ البيانات بدون الصور
+      const dataWithoutImages = removeImagesFromData(data);
+      try {
+        localStorage.setItem(`content_${key}`, JSON.stringify(dataWithoutImages));
+      } catch (secondError) {
+        console.error('فشل في حفظ البيانات حتى بدون الصور:', secondError);
+      }
+    } else {
+      console.error('خطأ في حفظ البيانات:', error);
+    }
+  }
+};
+
+// تنظيف البيانات من الصور الكبيرة
+const cleanDataForStorage = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(item => cleanDataForStorage(item));
+  }
+  
+  if (typeof data === 'object' && data !== null) {
+    const cleaned: any = {};
+    for (const key in data) {
+      if (key === 'images' && Array.isArray(data[key])) {
+        // الاحتفاظ فقط بالصور التي ليست Data URLs كبيرة
+        cleaned[key] = data[key].filter((img: string) => 
+          !img.startsWith('data:') || img.length < 50000 // أقل من 50KB
+        );
+      } else if (key === 'image' && typeof data[key] === 'string') {
+        // الاحتفاظ بالصورة فقط إذا لم تكن Data URL كبيرة
+        if (!data[key].startsWith('data:') || data[key].length < 50000) {
+          cleaned[key] = data[key];
+        } else {
+          cleaned[key] = 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800';
+        }
+      } else if (key === 'logo' && typeof data[key] === 'string') {
+        // الاحتفاظ بالشعار فقط إذا لم يكن Data URL كبير
+        if (!data[key].startsWith('data:') || data[key].length < 50000) {
+          cleaned[key] = data[key];
+        } else {
+          cleaned[key] = 'https://via.placeholder.com/150x80/1e40af/ffffff?text=شعار';
+        }
+      } else {
+        cleaned[key] = cleanDataForStorage(data[key]);
+      }
+    }
+    return cleaned;
+  }
+  
+  return data;
+};
+
+// إزالة الصور من البيانات كحل أخير
+const removeImagesFromData = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(item => removeImagesFromData(item));
+  }
+  
+  if (typeof data === 'object' && data !== null) {
+    const cleaned: any = {};
+    for (const key in data) {
+      if (key === 'images') {
+        cleaned[key] = ['https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800'];
+      } else if (key === 'image') {
+        cleaned[key] = 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800';
+      } else if (key === 'logo') {
+        cleaned[key] = 'https://via.placeholder.com/150x80/1e40af/ffffff?text=شعار';
+      } else {
+        cleaned[key] = removeImagesFromData(data[key]);
+      }
+    }
+    return cleaned;
+  }
+  
+  return data;
 };
 
 // الحصول على بيانات المحتوى

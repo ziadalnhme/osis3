@@ -159,6 +159,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   React.useEffect(() => {
     // دالة تحميل البيانات
     const loadData = () => {
+      console.log('تحميل البيانات في الصفحة الرئيسية...');
       const savedDesignWorks = localStorage.getItem('content_designWorks');
       const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
       const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
@@ -167,6 +168,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       if (savedDesignWorks) {
         try {
           const parsedDesignWorks = JSON.parse(savedDesignWorks);
+          console.log('تم تحميل أعمال التصميم:', parsedDesignWorks);
           setLoadedDesignCategories(parsedDesignWorks.map((work: any) => ({
             ...work,
             icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
@@ -179,6 +181,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       if (savedSupervisionWorks) {
         try {
           const parsedSupervisionWorks = JSON.parse(savedSupervisionWorks);
+          console.log('تم تحميل أعمال الإشراف:', parsedSupervisionWorks);
           setLoadedSupervisionCategories(parsedSupervisionWorks.map((work: any) => ({
             ...work,
             icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
@@ -190,7 +193,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       if (savedFeaturedProjects) {
         try {
-          setLoadedProjectsGallery(JSON.parse(savedFeaturedProjects));
+          const parsedFeaturedProjects = JSON.parse(savedFeaturedProjects);
+          console.log('تم تحميل المشاريع المميزة:', parsedFeaturedProjects);
+          setLoadedProjectsGallery(parsedFeaturedProjects);
         } catch (error) {
           console.error('خطأ في تحميل المشاريع المميزة:', error);
         }
@@ -198,7 +203,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
       if (savedClientLogos) {
         try {
-          setLoadedClientLogos(JSON.parse(savedClientLogos));
+          const parsedClientLogos = JSON.parse(savedClientLogos);
+          console.log('تم تحميل شعارات العملاء:', parsedClientLogos);
+          setLoadedClientLogos(parsedClientLogos);
         } catch (error) {
           console.error('خطأ في تحميل شعارات العملاء:', error);
         }
@@ -210,23 +217,37 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     
     // مراقبة تغييرات localStorage
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key && e.key.startsWith('content_')) {
+      console.log('تغيير في localStorage:', e.key);
+      if (e.key && (e.key.startsWith('content_') || e.key === 'adminMessages')) {
         loadData();
       }
     };
     
     // مراقبة الأحداث المخصصة
-    const handleContentUpdate = () => {
+    const handleContentUpdate = (e: CustomEvent) => {
+      console.log('حدث تحديث المحتوى:', e.detail);
       loadData();
+    };
+
+    // مراقبة تحديثات المحتوى المباشرة
+    const handleDirectUpdate = () => {
+      console.log('تحديث مباشر للمحتوى');
+      setTimeout(loadData, 100); // تأخير صغير للتأكد من حفظ البيانات
     };
 
     // مراقبة تغييرات localStorage
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('contentUpdated', handleContentUpdate);
+    window.addEventListener('dataUpdated', handleDirectUpdate);
+    
+    // فحص دوري للتحديثات (كحل احتياطي)
+    const interval = setInterval(loadData, 5000);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('contentUpdated', handleContentUpdate);
+      window.removeEventListener('dataUpdated', handleDirectUpdate);
+      clearInterval(interval);
     };
   }, []);
 

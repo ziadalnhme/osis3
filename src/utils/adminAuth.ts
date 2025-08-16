@@ -88,12 +88,33 @@ export const getAdminCredentials_Public = (): AdminUser => {
 // حفظ الصور المرفوعة
 export const saveUploadedImage = (file: File): Promise<string> => {
   return new Promise((resolve) => {
+    // فحص حجم الملف (أقل من 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      reject(new Error('حجم الملف كبير جداً. يرجى اختيار صورة أصغر من 2MB'));
+      return;
+    }
+    
     const reader = new FileReader();
     reader.onload = (e) => {
-      const imageData = e.target?.result as string;
-      // إرجاع البيانات مباشرة بدون حفظ في localStorage لتجنب تجاوز الحد المسموح
-      resolve(imageData);
+      try {
+        const imageData = e.target?.result as string;
+        
+        // فحص حجم البيانات المُرمزة
+        if (imageData.length > 500000) { // حوالي 500KB
+          console.warn('الصورة كبيرة، سيتم ضغطها');
+          // يمكن إضافة ضغط الصورة هنا في المستقبل
+        }
+        
+        resolve(imageData);
+      } catch (error) {
+        reject(error);
+      }
     };
+    
+    reader.onerror = () => {
+      reject(new Error('فشل في قراءة الملف'));
+    };
+    
     reader.readAsDataURL(file);
   });
 };

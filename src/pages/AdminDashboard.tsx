@@ -276,7 +276,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       }
       
       setShowEditModal(false);
+      console.log(`حفظ البيانات: ${key}`, data);
       setEditingItem(null);
+      
+      // إرسال أحداث متعددة للتأكد من التحديث
+      window.dispatchEvent(new CustomEvent('contentUpdated', { 
+        detail: { key, data } 
+      }));
+      
+      window.dispatchEvent(new CustomEvent('dataUpdated'));
+      
+      // إرسال حدث storage يدوياً
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: `content_${key}`,
+        newValue: JSON.stringify(data),
+        storageArea: localStorage
+      }));
+      
       setEditingType('');
       alert('تم الحفظ بنجاح');
     } catch (error) {
@@ -1143,11 +1159,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                         <p className="text-sm text-gray-600 mb-2">{message.email} | {message.phone}</p>
                         <p className="text-sm text-gray-800">{message.subject}</p>
                         {message.type === 'quote' && (
+                                  try {
                           <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                             <p className="text-sm text-blue-800">طلب تسعيرة - {message.projectDetails?.projectType}</p>
                           </div>
                         )}
                       </div>
+                                  } catch (error) {
+                                    console.error('خطأ في رفع الصورة:', error);
+                                    setErrorMessage('حدث خطأ أثناء رفع الصورة');
+                                    setTimeout(() => setErrorMessage(''), 3000);
+                                  }
                     ))
                   )}
                 </div>

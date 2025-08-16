@@ -326,7 +326,7 @@ const ContactPage: React.FC<ContactPageProps> = ({ onNavigate }) => {
                 </h3>
                 <div className="bg-gray-50 rounded-lg p-4 mb-4">
                   <img 
-                    src="/whatsapp-qr-code.png" 
+                    src="/باركود copy.png" 
                     alt="باركود الواتساب" 
                     className="w-32 h-32 mx-auto object-contain"
                   />

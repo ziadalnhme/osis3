@@ -1,1222 +1,1245 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, Users, MessageSquare, Settings, Bell, Search, Filter, Download, Eye, Trash2, Edit, Plus, Save, X, Calendar, Clock, Mail, Phone, Building, FileText, AlertCircle, TrendingUp, Activity, DollarSign, Star, CheckCircle } from 'lucide-react';
-import {
-  Shield, LogOut,
-  ArrowUpDown, MapPin, User, Send, Reply,
-  Upload
+import { 
+  Settings, 
+  LogOut, 
+  Users, 
+  Building, 
+  Home, 
+  Briefcase, 
+  Edit, 
+  Trash2, 
+  Plus, 
+  Save, 
+  X, 
+  Upload,
+  Eye,
+  User,
+  Lock,
+  Mail,
+  Image,
+  FileText,
+  Star,
+  MapPin,
+  Calendar
 } from 'lucide-react';
-import { getCurrentUser, logout, hasPermission } from '../utils/adminAuth';
+import { 
+  logout, 
+  getCurrentUser, 
+  updateAdminCredentials, 
+  verifyCurrentPassword,
+  getAdminCredentials_Public,
+  saveUploadedImage,
+  saveContentData,
+  getContentData,
+  getDefaultData,
+  type DesignWork,
+  type SupervisionWork,
+  type FeaturedProject,
+  type ClientLogo,
+  type TeamMember,
+  type Project
+} from '../utils/adminAuth';
 
 interface AdminDashboardProps {
   onNavigate: (page: string) => void;
 }
 
-interface Message {
-  id: number;
-  type: 'contact' | 'quote';
-  name: string;
-  email: string;
-  phone: string;
-  subject: string;
-  message: string;
-  date: string;
-  status: 'new' | 'read' | 'replied';
-  city?: string;
-  projectDetails?: any;
-}
-
-interface Project {
-  id: number;
-  title: string;
-  category: string;
-  location: string;
-  year: string;
-  area: string;
-  image: string;
-  description: string;
-  services: string[];
-  details: string;
-}
-
-interface Service {
-  id: number;
-  title: string;
-  description: string;
-  features: string[];
-}
-
-interface TeamMember {
-  id: number;
-  name: string;
-  position: string;
-  experience: string;
-  specialization: string;
-  image?: string;
-}
-
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [editingService, setEditingService] = useState<Service | null>(null);
-  const [editingTeamMember, setEditingTeamMember] = useState<TeamMember | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [showProjectsPageModal, setShowProjectsPageModal] = useState(false);
-  const [editingProjectsPage, setEditingProjectsPage] = useState<any>(null);
-  const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyText, setReplyText] = useState('');
-
-  const user = getCurrentUser();
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = () => {
-    // Load messages
-    const savedMessages = localStorage.getItem('adminMessages');
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
-
-    // Load projects
-    const savedProjects = localStorage.getItem('adminProjects');
-    if (savedProjects) {
-      setProjects(JSON.parse(savedProjects));
-    } else {
-      // Default projects
-      const defaultProjects: Project[] = [
-        {
-          id: 1,
-          title: 'مجمع الأمير السكني',
-          category: 'residential',
-          location: 'الرياض',
-          year: '2023',
-          area: '15,000 م²',
-          image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-          description: 'مجمع سكني فاخر يضم 120 وحدة سكنية',
-          services: ['التصميم المعماري', 'التصميم الإنشائي'],
-          details: 'مشروع سكني متكامل يجمع بين التصميم العصري والطابع المعماري المحلي'
-        }
-      ];
-      setProjects(defaultProjects);
-      localStorage.setItem('adminProjects', JSON.stringify(defaultProjects));
-    }
-
-    // Load services
-    const savedServices = localStorage.getItem('adminServices');
-    if (savedServices) {
-      setServices(JSON.parse(savedServices));
-    } else {
-      // Default services
-      const defaultServices: Service[] = [
-        {
-          id: 1,
-          title: 'التصميم المعماري',
-          description: 'تصميم معماري مبتكر يجمع بين الجمالية والوظيفية',
-          features: ['تصميم المباني السكنية', 'التصميم الداخلي', 'المخططات التنفيذية']
-        }
-      ];
-      setServices(defaultServices);
-      localStorage.setItem('adminServices', JSON.stringify(defaultServices));
-    }
-
-    // Load team members
-    const savedTeam = localStorage.getItem('adminTeam');
-    if (savedTeam) {
-      setTeamMembers(JSON.parse(savedTeam));
-    } else {
-      // Default team
-      const defaultTeam: TeamMember[] = [
-        {
-          id: 1,
-          name: 'م. أحمد السعيد',
-          position: 'المدير العام',
-          experience: '20 سنة خبرة',
-          specialization: 'الهندسة المعمارية'
-        }
-      ];
-      setTeamMembers(defaultTeam);
-      localStorage.setItem('adminTeam', JSON.stringify(defaultTeam));
-    }
-  };
-
-  const handleLogout = () => {
-    logout();
-    onNavigate('home');
-  };
-
-  const updateMessageStatus = (messageId: number, status: 'new' | 'read' | 'replied') => {
-    const updatedMessages = messages.map(msg => 
-      msg.id === messageId ? { ...msg, status } : msg
-    );
-    setMessages(updatedMessages);
-    localStorage.setItem('adminMessages', JSON.stringify(updatedMessages));
-  };
-
-  const deleteMessage = (messageId: number) => {
-    if (confirm('هل أنت متأكد من حذف هذه الرسالة؟')) {
-      const updatedMessages = messages.filter(msg => msg.id !== messageId);
-      setMessages(updatedMessages);
-      localStorage.setItem('adminMessages', JSON.stringify(updatedMessages));
-      setSelectedMessage(null);
-    }
-  };
-
-  const saveProject = (project: Project) => {
-    let updatedProjects;
-    if (project.id) {
-      updatedProjects = projects.map(p => p.id === project.id ? project : p);
-    } else {
-      const newProject = { ...project, id: Date.now() };
-      updatedProjects = [...projects, newProject];
-    }
-    setProjects(updatedProjects);
-    localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
-    setEditingProject(null);
-  };
-
-  const deleteProject = (projectId: number) => {
-    if (confirm('هل أنت متأكد من حذف هذا المشروع؟')) {
-      const updatedProjects = projects.filter(p => p.id !== projectId);
-      setProjects(updatedProjects);
-      localStorage.setItem('adminProjects', JSON.stringify(updatedProjects));
-    }
-  };
-
-  const saveService = (service: Service) => {
-    let updatedServices;
-    if (service.id) {
-      updatedServices = services.map(s => s.id === service.id ? service : s);
-    } else {
-      const newService = { ...service, id: Date.now() };
-      updatedServices = [...services, newService];
-    }
-    setServices(updatedServices);
-    localStorage.setItem('adminServices', JSON.stringify(updatedServices));
-    setEditingService(null);
-  };
-
-  const deleteService = (serviceId: number) => {
-    if (confirm('هل أنت متأكد من حذف هذه الخدمة؟')) {
-      const updatedServices = services.filter(s => s.id !== serviceId);
-      setServices(updatedServices);
-      localStorage.setItem('adminServices', JSON.stringify(updatedServices));
-    }
-  };
-
-  const saveTeamMember = (member: TeamMember) => {
-    let updatedTeam;
-    if (member.id) {
-      updatedTeam = teamMembers.map(m => m.id === member.id ? member : m);
-    } else {
-      const newMember = { ...member, id: Date.now() };
-      updatedTeam = [...teamMembers, newMember];
-    }
-    setTeamMembers(updatedTeam);
-    localStorage.setItem('adminTeam', JSON.stringify(updatedTeam));
-    setEditingTeamMember(null);
-  };
-
-  const deleteTeamMember = (memberId: number) => {
-    if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
-      const updatedTeam = teamMembers.filter(m => m.id !== memberId);
-      setTeamMembers(updatedTeam);
-      localStorage.setItem('adminTeam', JSON.stringify(updatedTeam));
-    }
-  };
-
-  const sendReply = () => {
-    if (selectedMessage && replyText.trim()) {
-      updateMessageStatus(selectedMessage.id, 'replied');
-      setShowReplyForm(false);
-      setReplyText('');
-      alert('تم إرسال الرد بنجاح!');
-    }
-  };
-
-  const filteredMessages = messages.filter(message => {
-    const matchesSearch = message.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         message.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         message.subject.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || message.status === filterStatus;
-    return matchesSearch && matchesFilter;
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showSettings, setShowSettings] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingType, setEditingType] = useState<string>('');
+  
+  // بيانات المدير
+  const [adminData, setAdminData] = useState({
+    username: '',
+    password: '',
+    email: '',
+    currentPassword: ''
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'new': return 'bg-red-100 text-red-800';
-      case 'read': return 'bg-yellow-100 text-yellow-800';
-      case 'replied': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+  // بيانات المحتوى
+  const [designWorks, setDesignWorks] = useState<DesignWork[]>([]);
+  const [supervisionWorks, setSupervisionWorks] = useState<SupervisionWork[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<FeaturedProject[]>([]);
+  const [clientLogos, setClientLogos] = useState<ClientLogo[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  // رسائل النظام
+  const [messages] = useState(() => {
+    return JSON.parse(localStorage.getItem('adminMessages') || '[]');
+  });
+
+  // تحميل البيانات عند بدء التشغيل
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = () => {
+    const defaultData = getDefaultData();
+    
+    // تحميل بيانات المدير
+    const adminCredentials = getAdminCredentials_Public();
+    setAdminData({
+      username: adminCredentials.username,
+      password: '',
+      email: adminCredentials.email,
+      currentPassword: ''
+    });
+
+    // تحميل بيانات المحتوى أو استخدام البيانات الافتراضية
+    setDesignWorks(getContentData('designWorks') || defaultData.designWorks);
+    setSupervisionWorks(getContentData('supervisionWorks') || defaultData.supervisionWorks);
+    setFeaturedProjects(getContentData('featuredProjects') || defaultData.featuredProjects);
+    setClientLogos(getContentData('clientLogos') || defaultData.clientLogos);
+    setTeamMembers(getContentData('teamMembers') || defaultData.teamMembers);
+    setProjects(getContentData('projects') || defaultData.projects);
+  };
+
+  // حفظ بيانات المدير
+  const handleSaveAdminData = () => {
+    if (!adminData.currentPassword) {
+      alert('يرجى إدخال كلمة المرور الحالية');
+      return;
+    }
+
+    if (!verifyCurrentPassword(adminData.currentPassword)) {
+      alert('كلمة المرور الحالية غير صحيحة');
+      return;
+    }
+
+    const newPassword = adminData.password || adminData.currentPassword;
+    
+    if (updateAdminCredentials(adminData.username, newPassword, adminData.email)) {
+      alert('تم تحديث البيانات بنجاح');
+      setShowSettings(false);
+      setAdminData(prev => ({ ...prev, password: '', currentPassword: '' }));
+    } else {
+      alert('حدث خطأ في تحديث البيانات');
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'new': return 'جديد';
-      case 'read': return 'مقروء';
-      case 'replied': return 'تم الرد';
-      default: return status;
+  // رفع الصور
+  const handleImageUpload = async (file: File): Promise<string> => {
+    try {
+      const imageUrl = await saveUploadedImage(file);
+      return imageUrl;
+    } catch (error) {
+      console.error('خطأ في رفع الصورة:', error);
+      throw error;
     }
   };
 
-  const renderDashboard = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">الرسائل الجديدة</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {messages.filter(m => m.status === 'new').length}
-              </p>
-            </div>
-            <MessageSquare className="h-8 w-8 text-blue-600" />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">إجمالي المشاريع</p>
-              <p className="text-2xl font-bold text-green-600">{projects.length}</p>
-            </div>
-            <Building className="h-8 w-8 text-green-600" />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">الخدمات</p>
-              <p className="text-2xl font-bold text-purple-600">{services.length}</p>
-            </div>
-            <FileText className="h-8 w-8 text-purple-600" />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">فريق العمل</p>
-              <p className="text-2xl font-bold text-orange-600">{teamMembers.length}</p>
-            </div>
-            <Users className="h-8 w-8 text-orange-600" />
-          </div>
-        </div>
-      </div>
+  // حفظ البيانات
+  const saveData = (type: string, data: any[]) => {
+    saveContentData(type, data);
+  };
 
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">الرسائل الأخيرة</h3>
-        <div className="space-y-3">
-          {messages.slice(0, 5).map((message) => (
-            <div key={message.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium text-gray-900">{message.name}</p>
-                <p className="text-sm text-gray-600">{message.subject}</p>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(message.status)}`}>
-                  {getStatusText(message.status)}
-                </span>
-                <span className="text-sm text-gray-500">{message.date}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  // إضافة عنصر جديد
+  const handleAdd = (type: string) => {
+    const newItem = createNewItem(type);
+    setEditingItem(newItem);
+    setEditingType(type);
+    setShowEditModal(true);
+  };
 
-  const renderMessages = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">إدارة الرسائل</h2>
-        <div className="flex gap-4">
-          <div className="relative">
-            <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="البحث في الرسائل..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">جميع الحالات</option>
-            <option value="new">جديد</option>
-            <option value="read">مقروء</option>
-            <option value="replied">تم الرد</option>
-          </select>
-        </div>
-      </div>
+  // تعديل عنصر
+  const handleEdit = (type: string, item: any) => {
+    setEditingItem({ ...item });
+    setEditingType(type);
+    setShowEditModal(true);
+  };
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الموضوع</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التاريخ</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">النوع</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredMessages.map((message) => (
-                <tr key={message.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{message.name}</div>
-                      <div className="text-sm text-gray-500">{message.email}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{message.subject}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {message.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      message.type === 'quote' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
-                    }`}>
-                      {message.type === 'quote' ? 'طلب تسعيرة' : 'رسالة تواصل'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(message.status)}`}>
-                      {getStatusText(message.status)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          setSelectedMessage(message);
-                          if (message.status === 'new') {
-                            updateMessageStatus(message.id, 'read');
-                          }
-                        }}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="عرض"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteMessage(message.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="حذف"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+  // حذف عنصر
+  const handleDelete = (type: string, id: string) => {
+    if (!confirm('هل أنت متأكد من الحذف؟')) return;
 
-  const renderProjects = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">إدارة المشاريع</h2>
-        <button
-          onClick={() => setEditingProject({
-            id: 0,
-            title: '',
-            category: '',
-            location: '',
-            year: '',
-            area: '',
-            image: '',
-            description: '',
-            services: [],
-            details: ''
-          })}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>إضافة مشروع</span>
-        </button>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المشروع</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الفئة</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الموقع</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">السنة</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {projects.map((project) => (
-                <tr key={project.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <img className="h-10 w-10 rounded-lg object-cover" src={project.image} alt={project.title} />
-                      <div className="mr-4">
-                        <div className="text-sm font-medium text-gray-900">{project.title}</div>
-                        <div className="text-sm text-gray-500">{project.area}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.category}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.location}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{project.year}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setEditingProject(project)}
-                        className="text-blue-600 hover:text-blue-900"
-                        title="تعديل"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteProject(project.id)}
-                        className="text-red-600 hover:text-red-900"
-                        title="حذف"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderServices = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">إدارة الخدمات</h2>
-        <button
-          onClick={() => setEditingService({
-            id: 0,
-            title: '',
-            description: '',
-            features: []
-          })}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>إضافة خدمة</span>
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-3">{service.title}</h3>
-            <p className="text-gray-600 mb-4">{service.description}</p>
-            <div className="space-y-2 mb-4">
-              {service.features.map((feature, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                  <span className="text-sm text-gray-700">{feature}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setEditingService(service)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>تعديل</span>
-              </button>
-              <button
-                onClick={() => deleteService(service.id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderTeam = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">إدارة فريق العمل</h2>
-        <button
-          onClick={() => setEditingTeamMember({
-            id: 0,
-            name: '',
-            position: '',
-            experience: '',
-            specialization: '',
-            image: ''
-          })}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>إضافة عضو</span>
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {teamMembers.map((member) => (
-          <div key={member.id} className="bg-white rounded-xl shadow-lg p-6 text-center">
-            <div className="w-20 h-20 bg-gray-300 rounded-full mx-auto mb-4 flex items-center justify-center">
-              {member.image ? (
-                <img src={member.image} alt={member.name} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                <User className="h-10 w-10 text-gray-500" />
-              )}
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">{member.name}</h3>
-            <p className="text-blue-600 font-medium mb-1">{member.position}</p>
-            <p className="text-gray-600 text-sm mb-2">{member.experience}</p>
-            <p className="text-gray-700 text-sm mb-4">{member.specialization}</p>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setEditingTeamMember(member)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>تعديل</span>
-              </button>
-              <button
-                onClick={() => deleteTeamMember(member.id)}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return renderDashboard();
-      case 'messages':
-        return renderMessages();
+    switch (type) {
+      case 'designWorks':
+        const newDesignWorks = designWorks.filter(item => item.id !== id);
+        setDesignWorks(newDesignWorks);
+        saveData('designWorks', newDesignWorks);
+        break;
+      case 'supervisionWorks':
+        const newSupervisionWorks = supervisionWorks.filter(item => item.id !== id);
+        setSupervisionWorks(newSupervisionWorks);
+        saveData('supervisionWorks', newSupervisionWorks);
+        break;
+      case 'featuredProjects':
+        const newFeaturedProjects = featuredProjects.filter(item => item.id !== id);
+        setFeaturedProjects(newFeaturedProjects);
+        saveData('featuredProjects', newFeaturedProjects);
+        break;
+      case 'clientLogos':
+        const newClientLogos = clientLogos.filter(item => item.id !== id);
+        setClientLogos(newClientLogos);
+        saveData('clientLogos', newClientLogos);
+        break;
+      case 'teamMembers':
+        const newTeamMembers = teamMembers.filter(item => item.id !== id);
+        setTeamMembers(newTeamMembers);
+        saveData('teamMembers', newTeamMembers);
+        break;
       case 'projects':
-        return renderProjects();
-      case 'services':
-        return renderServices();
-      case 'team':
-        return renderTeam();
-      default:
-        return renderDashboard();
+        const newProjects = projects.filter(item => item.id !== id);
+        setProjects(newProjects);
+        saveData('projects', newProjects);
+        break;
     }
   };
 
-  if (!user) {
+  // إنشاء عنصر جديد
+  const createNewItem = (type: string) => {
+    const id = Date.now().toString();
+    
+    switch (type) {
+      case 'designWorks':
+        return { id, title: '', icon: '🏠', images: [] };
+      case 'supervisionWorks':
+        return { id, title: '', icon: '🏗️', images: [] };
+      case 'featuredProjects':
+        return { id, title: '', category: '', image: '', description: '' };
+      case 'clientLogos':
+        return { id, name: '', logo: '' };
+      case 'teamMembers':
+        return { id, name: '', position: '', experience: '', specialization: '', image: '' };
+      case 'projects':
+        return { 
+          id, 
+          title: '', 
+          category: 'residential', 
+          location: '', 
+          year: new Date().getFullYear().toString(), 
+          area: '', 
+          description: '', 
+          image: '', 
+          services: [], 
+          details: '' 
+        };
+      default:
+        return {};
+    }
+  };
+
+  // حفظ التعديلات
+  const handleSaveEdit = async () => {
+    if (!editingItem) return;
+
+    try {
+      switch (editingType) {
+        case 'designWorks':
+          const updatedDesignWorks = editingItem.id && designWorks.find(item => item.id === editingItem.id)
+            ? designWorks.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...designWorks, editingItem];
+          setDesignWorks(updatedDesignWorks);
+          saveData('designWorks', updatedDesignWorks);
+          break;
+        case 'supervisionWorks':
+          const updatedSupervisionWorks = editingItem.id && supervisionWorks.find(item => item.id === editingItem.id)
+            ? supervisionWorks.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...supervisionWorks, editingItem];
+          setSupervisionWorks(updatedSupervisionWorks);
+          saveData('supervisionWorks', updatedSupervisionWorks);
+          break;
+        case 'featuredProjects':
+          const updatedFeaturedProjects = editingItem.id && featuredProjects.find(item => item.id === editingItem.id)
+            ? featuredProjects.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...featuredProjects, editingItem];
+          setFeaturedProjects(updatedFeaturedProjects);
+          saveData('featuredProjects', updatedFeaturedProjects);
+          break;
+        case 'clientLogos':
+          const updatedClientLogos = editingItem.id && clientLogos.find(item => item.id === editingItem.id)
+            ? clientLogos.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...clientLogos, editingItem];
+          setClientLogos(updatedClientLogos);
+          saveData('clientLogos', updatedClientLogos);
+          break;
+        case 'teamMembers':
+          const updatedTeamMembers = editingItem.id && teamMembers.find(item => item.id === editingItem.id)
+            ? teamMembers.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...teamMembers, editingItem];
+          setTeamMembers(updatedTeamMembers);
+          saveData('teamMembers', updatedTeamMembers);
+          break;
+        case 'projects':
+          const updatedProjects = editingItem.id && projects.find(item => item.id === editingItem.id)
+            ? projects.map(item => item.id === editingItem.id ? editingItem : item)
+            : [...projects, editingItem];
+          setProjects(updatedProjects);
+          saveData('projects', updatedProjects);
+          break;
+      }
+      
+      setShowEditModal(false);
+      setEditingItem(null);
+      setEditingType('');
+      alert('تم الحفظ بنجاح');
+    } catch (error) {
+      console.error('خطأ في الحفظ:', error);
+      alert('حدث خطأ في الحفظ');
+    }
+  };
+
+  // رفع صورة واحدة
+  const handleSingleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const imageUrl = await handleImageUpload(file);
+        setEditingItem(prev => ({ ...prev, [field]: imageUrl }));
+      } catch (error) {
+        alert('حدث خطأ في رفع الصورة');
+      }
+    }
+  };
+
+  // رفع صور متعددة
+  const handleMultipleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      const imageUrls = await Promise.all(files.map(file => handleImageUpload(file)));
+      setEditingItem(prev => ({ 
+        ...prev, 
+        images: [...(prev.images || []), ...imageUrls] 
+      }));
+    } catch (error) {
+      alert('حدث خطأ في رفع الصور');
+    }
+  };
+
+  // إزالة صورة من القائمة
+  const removeImage = (index: number) => {
+    setEditingItem(prev => ({
+      ...prev,
+      images: prev.images.filter((_: any, i: number) => i !== index)
+    }));
+  };
+
+  const tabs = [
+    { id: 'overview', label: 'نظرة عامة', icon: Home },
+    { id: 'homepage', label: 'الصفحة الرئيسية', icon: Home },
+    { id: 'about', label: 'حول الشركة', icon: Building },
+    { id: 'projects', label: 'المشاريع', icon: Briefcase },
+    { id: 'messages', label: 'الرسائل', icon: Users }
+  ];
+
+  const renderEditModal = () => {
+    if (!showEditModal || !editingItem) return null;
+
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">غير مصرح</h2>
-          <p className="text-gray-600 mb-4">يجب تسجيل الدخول للوصول لهذه الصفحة</p>
-          <button
-            onClick={() => onNavigate('home')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
-          >
-            العودة للرئيسية
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg">
-          <div className="p-6">
-            <div className="flex items-center space-x-3 mb-8">
-              <Shield className="h-8 w-8 text-blue-600" />
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">لوحة التحكم</h2>
-                <p className="text-sm text-gray-600">مرحباً {user.username}</p>
-              </div>
-            </div>
-
-            <nav className="space-y-2">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                  activeTab === 'dashboard' ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <BarChart3 className="h-5 w-5" />
-                <span>لوحة التحكم</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('messages')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                  activeTab === 'messages' ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <MessageSquare className="h-5 w-5" />
-                <span>الرسائل</span>
-                {messages.filter(m => m.status === 'new').length > 0 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 mr-auto">
-                    {messages.filter(m => m.status === 'new').length}
-                  </span>
-                )}
-              </button>
-
-              <button
-                onClick={() => setActiveTab('projects')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                  activeTab === 'projects' ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <Building className="h-5 w-5" />
-                <span>إدارة المشاريع</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('services')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                  activeTab === 'services' ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <FileText className="h-5 w-5" />
-                <span>إدارة الخدمات</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('team')}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                  activeTab === 'team' ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <Users className="h-5 w-5" />
-                <span>فريق العمل</span>
-              </button>
-            </nav>
-          </div>
-
-          <div className="absolute bottom-0 w-64 p-6 border-t">
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-gray-900">
+              {editingItem.id && (editingType === 'designWorks' ? designWorks.find(item => item.id === editingItem.id) : 
+                editingType === 'supervisionWorks' ? supervisionWorks.find(item => item.id === editingItem.id) :
+                editingType === 'featuredProjects' ? featuredProjects.find(item => item.id === editingItem.id) :
+                editingType === 'clientLogos' ? clientLogos.find(item => item.id === editingItem.id) :
+                editingType === 'teamMembers' ? teamMembers.find(item => item.id === editingItem.id) :
+                editingType === 'projects' ? projects.find(item => item.id === editingItem.id) : null) 
+                ? 'تعديل' : 'إضافة جديد'}
+            </h3>
             <button
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              onClick={() => setShowEditModal(false)}
+              className="text-gray-400 hover:text-gray-600"
             >
-              <LogOut className="h-5 w-5" />
-              <span>تسجيل الخروج</span>
+              <X className="h-6 w-6" />
             </button>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          {renderContent()}
-        </div>
-      </div>
-
-      {/* Message Details Modal */}
-      {selectedMessage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className={`p-6 rounded-t-2xl ${
-              selectedMessage.type === 'quote' ? 'bg-gradient-to-r from-blue-600 to-blue-800' : 'bg-gradient-to-r from-green-600 to-green-800'
-            } text-white`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-bold">
-                      {selectedMessage.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold">
-                      {selectedMessage.type === 'quote' ? 'طلب تسعيرة' : 'رسالة تواصل'}
-                    </h2>
-                    <p className="text-blue-100">{selectedMessage.subject}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedMessage(null)}
-                  className="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-full transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                {/* Client Info */}
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">معلومات العميل</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <User className="h-5 w-5 text-gray-400" />
-                      <span className="text-gray-700">{selectedMessage.name}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 text-gray-400" />
-                      <a href={`mailto:${selectedMessage.email}`} className="text-blue-600 hover:underline">
-                        {selectedMessage.email}
-                      </a>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 text-gray-400" />
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-700">{selectedMessage.phone}</span>
-                        <a href={`tel:${selectedMessage.phone}`} className="text-blue-600 hover:text-blue-800">
-                          <Phone className="h-4 w-4" />
-                        </a>
-                        <a href={`https://wa.me/${selectedMessage.phone.replace(/\D/g, '')}`} target="_blank\" rel="noopener noreferrer\" className="text-green-600 hover:text-green-800">
-                          <MessageSquare className="h-4 w-4" />
-                        </a>
-                      </div>
-                    </div>
-                    {selectedMessage.city && (
-                      <div className="flex items-center space-x-3">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                        <span className="text-gray-700">{selectedMessage.city}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center space-x-3">
-                      <Calendar className="h-5 w-5 text-gray-400" />
-                      <span className="text-gray-700">{selectedMessage.date}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedMessage.status)}`}>
-                        {getStatusText(selectedMessage.status)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Project Details for Quote Requests */}
-                {selectedMessage.type === 'quote' && selectedMessage.projectDetails && (
-                  <div className="bg-blue-50 rounded-xl p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">تفاصيل المشروع</h3>
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <span className="text-sm text-gray-600">نوع المشروع:</span>
-                        <p className="font-medium">{selectedMessage.projectDetails.projectType}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">الموقع:</span>
-                        <p className="font-medium">{selectedMessage.projectDetails.projectLocation}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">مساحة الأرض:</span>
-                        <p className="font-medium">{selectedMessage.projectDetails.plotArea} م²</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-600">مساحة البناء:</span>
-                        <p className="font-medium">{selectedMessage.projectDetails.buildingArea} م²</p>
-                      </div>
-                    </div>
-                    
-                    {selectedMessage.projectDetails.services && (
-                      <div className="mb-4">
-                        <span className="text-sm text-gray-600 block mb-2">الخدمات المطلوبة:</span>
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(selectedMessage.projectDetails.services).map(([key, value]) => 
-                            value && (
-                              <span key={key} className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs flex items-center space-x-1">
-                                <CheckCircle className="h-3 w-3" />
-                                <span>
-                                  {key === 'architecturalDesign' && 'التصميم المعماري'}
-                                  {key === 'structuralDesign' && 'التصميم الإنشائي'}
-                                  {key === 'mepDesign' && 'أنظمة الكهروميكانيك'}
-                                  {key === 'interiorDesign' && 'التصميم الداخلي'}
-                                  {key === 'landscapeDesign' && 'تنسيق الحدائق'}
-                                  {key === 'projectManagement' && 'إدارة المشروع'}
-                                </span>
-                              </span>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Message Content */}
-              <div className="bg-white border rounded-xl p-6 mb-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">محتوى الرسالة</h3>
-                <div className="prose max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{selectedMessage.message}</p>
-                </div>
-              </div>
-
-              {/* Reply Form */}
-              {showReplyForm && (
-                <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">الرد على العميل</h3>
-                  <textarea
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="اكتب ردك هنا..."
-                  />
-                  <div className="flex space-x-3 mt-4">
-                    <button
-                      onClick={sendReply}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium flex items-center space-x-2"
-                    >
-                      <Send className="h-4 w-4" />
-                      <span>إرسال الرد</span>
-                    </button>
-                    <button
-                      onClick={() => setShowReplyForm(false)}
-                      className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg font-medium"
-                    >
-                      إلغاء
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => setShowReplyForm(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                >
-                  <MessageSquare className="h-5 w-5" />
-                  <span>رد على العميل</span>
-                </button>
-                
-                <a
-                  href={`mailto:${selectedMessage.email}?subject=رد على: ${selectedMessage.subject}&body=عزيزي ${selectedMessage.name}،%0A%0Aشكراً لتواصلك معنا...`}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                >
-                  <Mail className="h-5 w-5" />
-                  <span>رد بالإيميل</span>
-                </a>
-                
-                <a
-                  href={`https://wa.me/${selectedMessage.phone.replace(/\D/g, '')}?text=مرحباً ${selectedMessage.name}، شكراً لتواصلك مع شركة أسس الأعمار للاستشارات الهندسية`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                >
-                  <Phone className="h-5 w-5" />
-                  <span>رد بالواتساب</span>
-                </a>
-                
-                <button
-                  onClick={() => updateMessageStatus(selectedMessage.id, 'replied')}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                >
-                  <CheckCircle className="h-5 w-5" />
-                  <span>تم الرد</span>
-                </button>
-              </div>
-
-              <div className="mt-6 pt-6 border-t text-center text-sm text-gray-500">
-                معرف الرسالة: #{selectedMessage.id}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Project Edit Modal */}
-      {editingProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-2xl">
-              <h2 className="text-xl font-bold">
-                {editingProject.id ? 'تعديل المشروع' : 'إضافة مشروع جديد'}
-              </h2>
-            </div>
-            <div className="p-6">
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                saveProject(editingProject);
-              }} className="space-y-4">
+          <div className="p-6 space-y-6">
+            {/* نموذج أعمال التصميم */}
+            {editingType === 'designWorks' && (
+              <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">اسم المشروع</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">العنوان</label>
                   <input
                     type="text"
-                    required
-                    value={editingProject.title}
-                    onChange={(e) => setEditingProject({...editingProject, title: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={editingItem.title || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
-                    <select
-                      value={editingProject.category}
-                      onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">اختر الفئة</option>
-                      <option value="residential">سكني</option>
-                      <option value="commercial">تجاري</option>
-                      <option value="educational">تعليمي</option>
-                      <option value="healthcare">صحي</option>
-                      <option value="industrial">صناعي</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
-                    <input
-                      type="text"
-                      value={editingProject.location}
-                      onChange={(e) => setEditingProject({...editingProject, location: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">السنة</label>
-                    <input
-                      type="text"
-                      value={editingProject.year}
-                      onChange={(e) => setEditingProject({...editingProject, year: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
-                    <input
-                      type="text"
-                      value={editingProject.area}
-                      onChange={(e) => setEditingProject({...editingProject, area: e.target.value})}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الأيقونة (إيموجي)</label>
+                  <input
+                    type="text"
+                    value={editingItem.icon || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, icon: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="🏠"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الصور</label>
                   <input
-                    type="url"
-                    value={editingProject.image}
-                    onChange={(e) => setEditingProject({...editingProject, image: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="https://example.com/image.jpg"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleMultipleImageUpload}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div className="mt-4 grid grid-cols-3 gap-4">
+                    {editingItem.images?.map((image: string, index: number) => (
+                      <div key={index} className="relative">
+                        <img src={image} alt={`صورة ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* نموذج أعمال الإشراف */}
+            {editingType === 'supervisionWorks' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">العنوان</label>
+                  <input
+                    type="text"
+                    value={editingItem.title || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الأيقونة (إيموجي)</label>
+                  <input
+                    type="text"
+                    value={editingItem.icon || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, icon: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="🏗️"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الصور</label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleMultipleImageUpload}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div className="mt-4 grid grid-cols-3 gap-4">
+                    {editingItem.images?.map((image: string, index: number) => (
+                      <div key={index} className="relative">
+                        <img src={image} alt={`صورة ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* نموذج المشاريع المميزة */}
+            {editingType === 'featuredProjects' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">العنوان</label>
+                  <input
+                    type="text"
+                    value={editingItem.title || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
+                  <input
+                    type="text"
+                    value={editingItem.category || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
                   <textarea
-                    value={editingProject.description}
-                    onChange={(e) => setEditingProject({...editingProject, description: e.target.value})}
+                    value={editingItem.description || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">التفاصيل</label>
-                  <textarea
-                    value={editingProject.details}
-                    onChange={(e) => setEditingProject({...editingProject, details: e.target.value})}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الصورة</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleSingleImageUpload(e, 'image')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
+                  {editingItem.image && (
+                    <img src={editingItem.image} alt="معاينة" className="mt-4 w-32 h-24 object-cover rounded-lg" />
+                  )}
                 </div>
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    <span>حفظ</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingProject(null)}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-medium"
-                  >
-                    إلغاء
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+              </>
+            )}
 
-      {/* Service Edit Modal */}
-      {editingService && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-6 rounded-t-2xl">
-              <h2 className="text-xl font-bold">
-                {editingService.id ? 'تعديل الخدمة' : 'إضافة خدمة جديدة'}
-              </h2>
-            </div>
-            <div className="p-6">
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                saveService(editingService);
-              }} className="space-y-4">
+            {/* نموذج شعارات العملاء */}
+            {editingType === 'clientLogos' && (
+              <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">اسم الخدمة</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">اسم العميل</label>
                   <input
                     type="text"
-                    required
-                    value={editingService.title}
-                    onChange={(e) => setEditingService({...editingService, title: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    value={editingItem.name || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">وصف الخدمة</label>
-                  <textarea
-                    value={editingService.description}
-                    onChange={(e) => setEditingService({...editingService, description: e.target.value})}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الشعار</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleSingleImageUpload(e, 'logo')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
+                  {editingItem.logo && (
+                    <img src={editingItem.logo} alt="معاينة الشعار" className="mt-4 w-32 h-20 object-contain rounded-lg border" />
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">المميزات (كل مميزة في سطر منفصل)</label>
-                  <textarea
-                    value={editingService.features.join('\n')}
-                    onChange={(e) => setEditingService({...editingService, features: e.target.value.split('\n').filter(f => f.trim())})}
-                    rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    placeholder="مميزة 1&#10;مميزة 2&#10;مميزة 3"
-                  />
-                </div>
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="submit"
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    <span>حفظ</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingService(null)}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-medium"
-                  >
-                    إلغاء
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+              </>
+            )}
 
-      {/* Team Member Edit Modal */}
-      {editingTeamMember && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="bg-gradient-to-r from-orange-600 to-orange-800 text-white p-6 rounded-t-2xl">
-              <h2 className="text-xl font-bold">
-                {editingTeamMember.id ? 'تعديل عضو الفريق' : 'إضافة عضو جديد'}
-              </h2>
-            </div>
-            <div className="p-6">
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                saveTeamMember(editingTeamMember);
-              }} className="space-y-4">
+            {/* نموذج فريق العمل */}
+            {editingType === 'teamMembers' && (
+              <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
                   <input
                     type="text"
-                    required
-                    value={editingTeamMember.name}
-                    onChange={(e) => setEditingTeamMember({...editingTeamMember, name: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    value={editingItem.name || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">المنصب</label>
                   <input
                     type="text"
-                    value={editingTeamMember.position}
-                    onChange={(e) => setEditingTeamMember({...editingTeamMember, position: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    value={editingItem.position || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, position: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">سنوات الخبرة</label>
                   <input
                     type="text"
-                    value={editingTeamMember.experience}
-                    onChange={(e) => setEditingTeamMember({...editingTeamMember, experience: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    value={editingItem.experience || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, experience: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">التخصص</label>
                   <input
                     type="text"
-                    value={editingTeamMember.specialization}
-                    onChange={(e) => setEditingTeamMember({...editingTeamMember, specialization: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    value={editingItem.specialization || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, specialization: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الصورة الشخصية</label>
                   <input
-                    type="url"
-                    value={editingTeamMember.image || ''}
-                    onChange={(e) => setEditingTeamMember({...editingTeamMember, image: e.target.value})}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="https://example.com/image.jpg"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleSingleImageUpload(e, 'image')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  {editingItem.image && (
+                    <img src={editingItem.image} alt="معاينة الصورة" className="mt-4 w-24 h-24 object-cover rounded-full" />
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* نموذج المشاريع */}
+            {editingType === 'projects' && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">اسم المشروع</label>
+                    <input
+                      type="text"
+                      value={editingItem.title || ''}
+                      onChange={(e) => setEditingItem(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
+                    <select
+                      value={editingItem.category || 'residential'}
+                      onChange={(e) => setEditingItem(prev => ({ ...prev, category: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="residential">مشاريع سكنية</option>
+                      <option value="commercial">مشاريع تجارية</option>
+                      <option value="educational">مشاريع تعليمية</option>
+                      <option value="healthcare">مشاريع صحية</option>
+                      <option value="industrial">مشاريع صناعية</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
+                    <input
+                      type="text"
+                      value={editingItem.location || ''}
+                      onChange={(e) => setEditingItem(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">سنة التنفيذ</label>
+                    <input
+                      type="text"
+                      value={editingItem.year || ''}
+                      onChange={(e) => setEditingItem(prev => ({ ...prev, year: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
+                    <input
+                      type="text"
+                      value={editingItem.area || ''}
+                      onChange={(e) => setEditingItem(prev => ({ ...prev, area: e.target.value }))}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="مثال: 15,000 م²"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">وصف المشروع</label>
+                  <textarea
+                    value={editingItem.description || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    rows={3}
                   />
                 </div>
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="submit"
-                    className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
-                  >
-                    <Save className="h-4 w-4" />
-                    <span>حفظ</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingTeamMember(null)}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-3 rounded-lg font-medium"
-                  >
-                    إلغاء
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">التفاصيل الكاملة</label>
+                  <textarea
+                    value={editingItem.details || ''}
+                    onChange={(e) => setEditingItem(prev => ({ ...prev, details: e.target.value }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    rows={4}
+                  />
                 </div>
-              </form>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الخدمات المقدمة (منفصلة بفاصلة)</label>
+                  <input
+                    type="text"
+                    value={Array.isArray(editingItem.services) ? editingItem.services.join(', ') : ''}
+                    onChange={(e) => setEditingItem(prev => ({ 
+                      ...prev, 
+                      services: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                    }))}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="التصميم المعماري, التصميم الإنشائي, أنظمة الكهروميكانيك"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الصورة الرئيسية</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleSingleImageUpload(e, 'image')}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  {editingItem.image && (
+                    <img src={editingItem.image} alt="معاينة المشروع" className="mt-4 w-48 h-32 object-cover rounded-lg" />
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
+            <button
+              onClick={() => setShowEditModal(false)}
+              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            >
+              إلغاء
+            </button>
+            <button
+              onClick={handleSaveEdit}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            >
+              <Save className="h-4 w-4" />
+              <span>حفظ</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900">لوحة التحكم</h1>
+              <span className="text-sm text-gray-500">أسس الأعمار للاستشارات الهندسية</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                title="الإعدادات"
+              >
+                <Settings className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => {
+                  logout();
+                  onNavigate('home');
+                }}
+                className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>تسجيل الخروج</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar */}
+          <div className="lg:w-64">
+            <nav className="bg-white rounded-lg shadow-sm p-4">
+              <ul className="space-y-2">
+                {tabs.map((tab) => (
+                  <li key={tab.id}>
+                    <button
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
+                        activeTab === tab.id
+                          ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <tab.icon className="h-5 w-5" />
+                      <span>{tab.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* نظرة عامة */}
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4">نظرة عامة</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-blue-600">الرسائل الجديدة</p>
+                          <p className="text-2xl font-bold text-blue-900">{messages.filter(m => m.status === 'new').length}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-green-600">إجمالي المشاريع</p>
+                          <p className="text-2xl font-bold text-green-900">{projects.length}</p>
+                        </div>
+                        <Building className="h-8 w-8 text-green-600" />
+                      </div>
+                    </div>
+                    <div className="bg-yellow-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-yellow-600">فريق العمل</p>
+                          <p className="text-2xl font-bold text-yellow-900">{teamMembers.length}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-yellow-600" />
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-purple-600">العملاء</p>
+                          <p className="text-2xl font-bold text-purple-900">{clientLogos.length}</p>
+                        </div>
+                        <Star className="h-8 w-8 text-purple-600" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* الصفحة الرئيسية */}
+            {activeTab === 'homepage' && (
+              <div className="space-y-6">
+                {/* أعمالنا في التصميم */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">أعمالنا في التصميم</h3>
+                    <button
+                      onClick={() => handleAdd('designWorks')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {designWorks.map((work) => (
+                      <div key={work.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-2xl">{work.icon}</span>
+                            <h4 className="font-semibold">{work.title}</h4>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEdit('designWorks', work)}
+                              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete('designWorks', work.id)}
+                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {work.images.slice(0, 4).map((image, index) => (
+                            <img key={index} src={image} alt="" className="w-full h-16 object-cover rounded" />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* أعمالنا في الإشراف */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">أعمالنا في الإشراف</h3>
+                    <button
+                      onClick={() => handleAdd('supervisionWorks')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {supervisionWorks.map((work) => (
+                      <div key={work.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-2xl">{work.icon}</span>
+                            <h4 className="font-semibold">{work.title}</h4>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleEdit('supervisionWorks', work)}
+                              className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete('supervisionWorks', work.id)}
+                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {work.images.slice(0, 4).map((image, index) => (
+                            <img key={index} src={image} alt="" className="w-full h-16 object-cover rounded" />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* المشاريع المميزة */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">مشاريعنا المميزة</h3>
+                    <button
+                      onClick={() => handleAdd('featuredProjects')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {featuredProjects.map((project) => (
+                      <div key={project.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <img src={project.image} alt={project.title} className="w-full h-32 object-cover" />
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold">{project.title}</h4>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit('featuredProjects', project)}
+                                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete('featuredProjects', project.id)}
+                                className="p-1 text-red-600 hover:bg-red-50 rounded"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-sm text-blue-600 mb-2">{project.category}</p>
+                          <p className="text-sm text-gray-600">{project.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* شعارات العملاء */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">شعارات العملاء</h3>
+                    <button
+                      onClick={() => handleAdd('clientLogos')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {clientLogos.map((client) => (
+                      <div key={client.id} className="border border-gray-200 rounded-lg p-4 text-center">
+                        <img src={client.logo} alt={client.name} className="w-full h-16 object-contain mb-2" />
+                        <p className="text-xs text-gray-600 mb-2">{client.name}</p>
+                        <div className="flex justify-center space-x-2">
+                          <button
+                            onClick={() => handleEdit('clientLogos', client)}
+                            className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete('clientLogos', client.id)}
+                            className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* حول الشركة */}
+            {activeTab === 'about' && (
+              <div className="space-y-6">
+                {/* فريق العمل */}
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">فريق العمل</h3>
+                    <button
+                      onClick={() => handleAdd('teamMembers')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة عضو</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {teamMembers.map((member) => (
+                      <div key={member.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center space-x-4 mb-4">
+                          {member.image ? (
+                            <img src={member.image} alt={member.name} className="w-16 h-16 object-cover rounded-full" />
+                          ) : (
+                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
+                              <User className="h-8 w-8 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-900">{member.name}</h4>
+                            <p className="text-sm text-blue-600">{member.position}</p>
+                            <p className="text-xs text-gray-500">{member.experience}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-4">{member.specialization}</p>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => handleEdit('teamMembers', member)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete('teamMembers', member.id)}
+                            className="p-2 text-red-600 hover:bg-red-50 rounded"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* المشاريع */}
+            {activeTab === 'projects' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-gray-900">جميع المشاريع</h3>
+                    <button
+                      onClick={() => handleAdd('projects')}
+                      className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4" />
+                      <span>إضافة مشروع</span>
+                    </button>
+                  </div>
+                  
+                  {/* فلاتر الفئات */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {[
+                      { key: 'all', label: 'جميع المشاريع' },
+                      { key: 'residential', label: 'مشاريع سكنية' },
+                      { key: 'commercial', label: 'مشاريع تجارية' },
+                      { key: 'educational', label: 'مشاريع تعليمية' },
+                      { key: 'healthcare', label: 'مشاريع صحية' },
+                      { key: 'industrial', label: 'مشاريع صناعية' }
+                    ].map((filter) => (
+                      <button
+                        key={filter.key}
+                        className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {projects.map((project) => (
+                      <div key={project.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                        <img src={project.image} alt={project.title} className="w-full h-48 object-cover" />
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{project.title}</h4>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEdit('projects', project)}
+                                className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete('projects', project.id)}
+                                className="p-1 text-red-600 hover:bg-red-50 rounded"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500 mb-2">
+                            <div className="flex items-center space-x-1">
+                              <MapPin className="h-4 w-4" />
+                              <span>{project.location}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Calendar className="h-4 w-4" />
+                              <span>{project.year}</span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-3">{project.description}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {project.services.slice(0, 2).map((service, index) => (
+                              <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
+                                {service}
+                              </span>
+                            ))}
+                            {project.services.length > 2 && (
+                              <span className="text-blue-600 text-xs">+{project.services.length - 2}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* الرسائل */}
+            {activeTab === 'messages' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">الرسائل والاستفسارات</h3>
+                <div className="space-y-4">
+                  {messages.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">لا توجد رسائل حالياً</p>
+                  ) : (
+                    messages.map((message: any) => (
+                      <div key={message.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-3">
+                            <h4 className="font-semibold text-gray-900">{message.name}</h4>
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              message.status === 'new' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                            }`}>
+                              {message.status === 'new' ? 'جديد' : 'مقروء'}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-500">{message.date}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{message.email} | {message.phone}</p>
+                        <p className="text-sm text-gray-800">{message.subject}</p>
+                        {message.type === 'quote' && (
+                          <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+                            <p className="text-sm text-blue-800">طلب تسعيرة - {message.projectDetails?.projectType}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* نافذة الإعدادات */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">إعدادات المدير</h3>
+              <button
+                onClick={() => setShowSettings(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">اسم المستخدم</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={adminData.username}
+                    onChange={(e) => setAdminData(prev => ({ ...prev, username: e.target.value }))}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <User className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">البريد الإلكتروني</label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={adminData.email}
+                    onChange={(e) => setAdminData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                  <Mail className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">كلمة المرور الحالية *</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={adminData.currentPassword}
+                    onChange={(e) => setAdminData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="أدخل كلمة المرور الحالية"
+                  />
+                  <Lock className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">كلمة المرور الجديدة (اختياري)</label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={adminData.password}
+                    onChange={(e) => setAdminData(prev => ({ ...prev, password: e.target.value }))}
+                    className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="اتركه فارغاً للاحتفاظ بالحالية"
+                  />
+                  <Lock className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
+              <button
+                onClick={() => setShowSettings(false)}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSaveAdminData}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                حفظ التغييرات
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* نافذة التعديل */}
+      {renderEditModal()}
     </div>
   );
 };

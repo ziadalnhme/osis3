@@ -104,6 +104,44 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     { name: 'شركة الخطوط السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الخطوط' }
   ];
 
+  // تحميل البيانات من localStorage أو استخدام البيانات الافتراضية
+  const [loadedDesignCategories, setLoadedDesignCategories] = React.useState(designCategories);
+  const [loadedSupervisionCategories, setLoadedSupervisionCategories] = React.useState(supervisionCategories);
+  const [loadedProjectsGallery, setLoadedProjectsGallery] = React.useState(projectsGallery);
+  const [loadedClientLogos, setLoadedClientLogos] = React.useState(clientLogos);
+
+  React.useEffect(() => {
+    // تحميل البيانات المحفوظة من localStorage
+    const savedDesignWorks = localStorage.getItem('content_designWorks');
+    const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
+    const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
+    const savedClientLogos = localStorage.getItem('content_clientLogos');
+
+    if (savedDesignWorks) {
+      const parsedDesignWorks = JSON.parse(savedDesignWorks);
+      setLoadedDesignCategories(parsedDesignWorks.map((work: any) => ({
+        ...work,
+        icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
+      })));
+    }
+
+    if (savedSupervisionWorks) {
+      const parsedSupervisionWorks = JSON.parse(savedSupervisionWorks);
+      setLoadedSupervisionCategories(parsedSupervisionWorks.map((work: any) => ({
+        ...work,
+        icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
+      })));
+    }
+
+    if (savedFeaturedProjects) {
+      setLoadedProjectsGallery(JSON.parse(savedFeaturedProjects));
+    }
+
+    if (savedClientLogos) {
+      setLoadedClientLogos(JSON.parse(savedClientLogos));
+    }
+  }, []);
+
   const engineeringImages = [
     'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=1920',
     'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1920',
@@ -190,11 +228,11 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   React.useEffect(() => {
     if (isGalleryPlaying) {
       const interval = setInterval(() => {
-        setCurrentProjectIndex((prev) => (prev + 1) % projectsGallery.length);
+        setCurrentProjectIndex((prev) => (prev + 1) % loadedProjectsGallery.length);
       }, 4000);
       return () => clearInterval(interval);
     }
-  }, [isGalleryPlaying, projectsGallery.length]);
+  }, [isGalleryPlaying, loadedProjectsGallery.length]);
 
   // Animated counter effect
   React.useEffect(() => {
@@ -350,12 +388,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {designCategories.map((category, index) => (
+            {loadedDesignCategories.map((category, index) => (
               <div key={category.id} className="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="p-6">
                   <div className="flex items-center mb-4">
                     <div className="bg-blue-600 text-white p-3 rounded-lg ml-3">
-                      <category.icon className="h-6 w-6" />
+                      {React.createElement(category.icon, { className: "h-6 w-6" })}
                     </div>
                     <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
                   </div>
@@ -392,12 +430,12 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {supervisionCategories.map((category, index) => (
+            {loadedSupervisionCategories.map((category, index) => (
               <div key={category.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="p-6">
                   <div className="flex items-center mb-4">
                     <div className="bg-yellow-500 text-white p-3 rounded-lg ml-3">
-                      <category.icon className="h-6 w-6" />
+                      {React.createElement(category.icon, { className: "h-6 w-6" })}
                     </div>
                     <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
                   </div>
@@ -487,7 +525,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           <div className="relative">
             {/* Main Gallery Display */}
             <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-              {projectsGallery.map((project, index) => (
+              {loadedProjectsGallery.map((project, index) => (
                 <div
                   key={project.id}
                   className={`absolute inset-0 transition-all duration-1000 ${
@@ -523,7 +561,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
             {/* Thumbnails */}
             <div className="flex justify-center mt-8 space-x-4 overflow-x-auto pb-4">
-              {projectsGallery.map((project, index) => (
+              {loadedProjectsGallery.map((project, index) => (
                 <button
                   key={project.id}
                   onClick={() => setCurrentProjectIndex(index)}
@@ -544,7 +582,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
             {/* Progress Indicators */}
             <div className="flex justify-center mt-6 space-x-2">
-              {projectsGallery.map((_, index) => (
+              {loadedProjectsGallery.map((_, index) => (
                 <div
                   key={index}
                   className={`h-2 rounded-full transition-all duration-300 ${
@@ -596,7 +634,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               </p>
               <button
                 onClick={() => {
-                  window.open('/company-profile.pdf', '_blank');
+                  window.open('https://drive.google.com/file/d/12kL0cCvkybGzv1YvWveIqIIryYVGMHKY/view?usp=sharing', '_blank');
                 }}
                 className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-10 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-3"
               >
@@ -657,7 +695,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </div>
           <div className="relative overflow-hidden">
             <div className="flex animate-scroll">
-              {[...clientLogos, ...clientLogos].map((client, index) => (
+              {[...loadedClientLogos, ...loadedClientLogos].map((client, index) => (
                 <div
                   key={index}
                   className="flex-shrink-0 mx-8 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4"

@@ -135,6 +135,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   // حفظ البيانات
   const saveData = (type: string, data: any[]) => {
     saveContentData(type, data);
+    // إرسال حدث مخصص لتحديث الصفحة الرئيسية
+    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: type, data } }));
   };
 
   // إضافة عنصر جديد

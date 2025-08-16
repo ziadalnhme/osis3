@@ -249,10 +249,6 @@ export const getDefaultData = () => {
     ]
   };
 };
-    return true;
-  }
-  return false;
-};
 
 // فحص الصلاحيات
 export const hasPermission = (permission: string): boolean => {

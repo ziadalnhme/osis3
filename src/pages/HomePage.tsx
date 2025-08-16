@@ -18,6 +18,52 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   });
   const [hasAnimated, setHasAnimated] = React.useState(false);
 
+  // Projects Gallery - moved before usage
+  const projectsGallery = [
+    {
+      id: 1,
+      title: language === 'ar' ? 'مجمع الأمير السكني' : 'Al-Amir Residential Complex',
+      category: t('gallery.residential'),
+      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مجمع سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
+    },
+    {
+      id: 2,
+      title: language === 'ar' ? 'مركز النور التجاري' : 'Al-Noor Commercial Center',
+      category: t('gallery.commercial'),
+      image: 'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مركز تجاري حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
+    },
+    {
+      id: 3,
+      title: language === 'ar' ? 'مدرسة المستقبل' : 'Future School',
+      category: t('gallery.educational'),
+      image: 'https://images.pexels.com/photos/159490/yale-university-landscape-universities-schools-159490.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مدرسة نموذجية مجهزة بأحدث التقنيات' : 'Model school equipped with latest technology'
+    },
+    {
+      id: 4,
+      title: language === 'ar' ? 'مستشفى الشفاء' : 'Al-Shifa Hospital',
+      category: t('gallery.healthcare'),
+      image: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مستشفى متخصص مجهز بأحدث المعدات' : 'Specialized hospital with latest equipment'
+    },
+    {
+      id: 5,
+      title: language === 'ar' ? 'مصنع الابتكار' : 'Innovation Factory',
+      category: t('gallery.industrial'),
+      image: 'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مصنع حديث للصناعات الغذائية' : 'Modern food industry factory'
+    },
+    {
+      id: 6,
+      title: language === 'ar' ? 'جسر الملك فهد' : 'King Fahd Bridge',
+      category: t('gallery.infrastructure'),
+      image: 'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مشروع بنية تحتية متطور' : 'Advanced infrastructure project'
+    }
+  ];
+
   // Design work categories
   const designCategories = [
     {
@@ -178,51 +224,6 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     { number: '120+', label: t('stats.clients'), key: 'clients', target: 120, icon: Users },
     { number: '15+', label: t('stats.experience'), key: 'experience', target: 15, icon: Calendar },
     { number: '35+', label: t('stats.engineers'), key: 'engineers', target: 35, icon: Briefcase }
-  ];
-
-  const projectsGallery = [
-    {
-      id: 1,
-      title: language === 'ar' ? 'مجمع الأمير السكني' : 'Al-Amir Residential Complex',
-      category: t('gallery.residential'),
-      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مجمع سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
-    },
-    {
-      id: 2,
-      title: language === 'ar' ? 'مركز النور التجاري' : 'Al-Noor Commercial Center',
-      category: t('gallery.commercial'),
-      image: 'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مركز تجاري حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
-    },
-    {
-      id: 3,
-      title: language === 'ar' ? 'مدرسة المستقبل' : 'Future School',
-      category: t('gallery.educational'),
-      image: 'https://images.pexels.com/photos/159490/yale-university-landscape-universities-schools-159490.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مدرسة نموذجية مجهزة بأحدث التقنيات' : 'Model school equipped with latest technology'
-    },
-    {
-      id: 4,
-      title: language === 'ar' ? 'مستشفى الشفاء' : 'Al-Shifa Hospital',
-      category: t('gallery.healthcare'),
-      image: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مستشفى متخصص مجهز بأحدث المعدات' : 'Specialized hospital with latest equipment'
-    },
-    {
-      id: 5,
-      title: language === 'ar' ? 'مصنع الابتكار' : 'Innovation Factory',
-      category: t('gallery.industrial'),
-      image: 'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مصنع حديث للصناعات الغذائية' : 'Modern food industry factory'
-    },
-    {
-      id: 6,
-      title: language === 'ar' ? 'جسر الملك فهد' : 'King Fahd Bridge',
-      category: t('gallery.infrastructure'),
-      image: 'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مشروع بنية تحتية متطور' : 'Advanced infrastructure project'
-    }
   ];
 
   React.useEffect(() => {

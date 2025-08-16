@@ -27,7 +27,7 @@ const ProjectsPage: React.FC<ProjectsPageProps> = ({ onNavigate }) => {
       year: '2023',
       area: '15,000 م²',
       description: 'مجمع سكني فاخر يضم 120 وحدة سكنية مع مرافق ترفيهية ومساحات خضراء',
-      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: 'https://res.cloudinary.com/dw4e01qx8/f_auto,q_auto/images/xe4lkei6limwo3emkg4i',
       services: ['التصميم المعماري', 'التصميم الإنشائي', 'أنظمة الكهروميكانيك'],
       details: 'مشروع سكني متكامل يجمع بين التصميم العصري والطابع المعماري المحلي، مع مراعاة أعلى معايير الجودة والاستدامة البيئية.'
     },

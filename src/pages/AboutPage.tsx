@@ -1,11 +1,81 @@
 import React from 'react';
 import { Target, Eye, Award, Users, Calendar, CheckCircle, Building } from 'lucide-react';
+import { getContentData } from '../utils/adminAuth';
 
 interface AboutPageProps {
   onNavigate: (page: string) => void;
 }
 
 const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
+  // بيانات فريق العمل الافتراضية
+  const defaultTeamMembers = [
+    {
+      id: '1',
+      name: 'م. أحمد السعيد',
+      position: 'المدير العام',
+      experience: '20 سنة خبرة',
+      specialization: 'الهندسة المعمارية'
+    },
+    {
+      id: '2',
+      name: 'م. فاطمة الزهراني',
+      position: 'مدير التصميم',
+      experience: '15 سنة خبرة',
+      specialization: 'التصميم الإنشائي'
+    },
+    {
+      id: '3',
+      name: 'م. محمد العتيبي',
+      position: 'مدير المشاريع',
+      experience: '18 سنة خبرة',
+      specialization: 'إدارة المشاريع'
+    },
+    {
+      id: '4',
+      name: 'م. سارة القحطاني',
+      position: 'مهندسة كهروميكانيك',
+      experience: '12 سنة خبرة',
+      specialization: 'الأنظمة الكهروميكانيكية'
+    }
+  ];
+
+  // حالة فريق العمل
+  const [teamMembers, setTeamMembers] = React.useState(defaultTeamMembers);
+
+  // تحميل بيانات فريق العمل من localStorage
+  React.useEffect(() => {
+    const loadTeamData = () => {
+      const savedTeamMembers = getContentData('teamMembers');
+      if (savedTeamMembers && Array.isArray(savedTeamMembers)) {
+        setTeamMembers(savedTeamMembers);
+      }
+    };
+
+    loadTeamData();
+
+    // مراقبة تغييرات localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'content_teamMembers') {
+        loadTeamData();
+      }
+    };
+
+    // مراقبة الأحداث المخصصة
+    const handleContentUpdate = (e: CustomEvent) => {
+      if (e.detail.key === 'teamMembers') {
+        loadTeamData();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('contentUpdated', handleContentUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('contentUpdated', handleContentUpdate as EventListener);
+    };
+  }, []);
+
   const values = [
     {
       icon: CheckCircle,
@@ -26,33 +96,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       icon: Calendar,
       title: 'الالتزام بالمواعيد',
       description: 'نحترم أوقات عملائنا ونلتزم بالجداول الزمنية المحددة'
-    }
-  ];
-
-  const teamMembers = [
-    {
-      name: 'م. أحمد السعيد',
-      position: 'المدير العام',
-      experience: '20 سنة خبرة',
-      specialization: 'الهندسة المعمارية'
-    },
-    {
-      name: 'م. فاطمة الزهراني',
-      position: 'مدير التصميم',
-      experience: '15 سنة خبرة',
-      specialization: 'التصميم الإنشائي'
-    },
-    {
-      name: 'م. محمد العتيبي',
-      position: 'مدير المشاريع',
-      experience: '18 سنة خبرة',
-      specialization: 'إدارة المشاريع'
-    },
-    {
-      name: 'م. سارة القحطاني',
-      position: 'مهندسة كهروميكانيك',
-      experience: '12 سنة خبرة',
-      specialization: 'الأنظمة الكهروميكانيكية'
     }
   ];
 
@@ -215,7 +258,17 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 key={index}
                 className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
-                <div className="bg-gradient-to-br from-blue-600 to-blue-800 h-32"></div>
+                <div className="bg-gradient-to-br from-blue-600 to-blue-800 h-32 relative overflow-hidden">
+                  {member.image ? (
+                    <img 
+                      src={member.image} 
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-600 to-blue-800"></div>
+                  )}
+                </div>
                 <div className="p-6 text-center">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
                   <p className="text-blue-600 font-semibold mb-1">{member.position}</p>

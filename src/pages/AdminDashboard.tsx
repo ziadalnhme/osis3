@@ -292,12 +292,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
         setEditingItem(prev => ({ ...prev, [field]: imageUrl }));
       } catch (error) {
         alert('حدث خطأ في رفع الصورة');
-        console.error('خطأ في الحفظ:', error);
-        alert('تم الحفظ بنجاح! (تم تحسين الصور لتوفير مساحة التخزين)');
-        setShowAddModal(false);
-        alert('تم الحفظ بنجاح! (تم تحسين الصور لتوفير مساحة التخزين)');
-        setShowEditModal(false);
-        setEditingItem(null);
+      }
+    }
+  };
 
   // رفع صور متعددة
   const handleMultipleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

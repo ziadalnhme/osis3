@@ -659,16 +659,6 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* View All Projects Button */}
-          <div className="text-center mt-12">
-            <button
-              onClick={() => onNavigate('projects')}
-              className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-10 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-3"
-            >
-              <span>{t('gallery.viewall')}</span>
-              <ArrowRight className={`h-6 w-6 ${language === 'ar' ? 'rotate-180' : ''}`} />
-            </button>
-          </div>
         </div>
       </section>
 

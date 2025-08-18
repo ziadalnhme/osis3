@@ -59,7 +59,6 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <ul className="space-y-2">
               <li><button onClick={() => onNavigate?.('about')} className={`text-gray-300 hover:text-white transition-colors ${language === 'en' ? 'text-left' : 'text-right'}`}>{t('nav.about')}</button></li>
               <li><button onClick={() => onNavigate?.('services')} className={`text-gray-300 hover:text-white transition-colors ${language === 'en' ? 'text-left' : 'text-right'}`}>{t('nav.services')}</button></li>
-              <li><button onClick={() => onNavigate?.('projects')} className={`text-gray-300 hover:text-white transition-colors ${language === 'en' ? 'text-left' : 'text-right'}`}>{t('nav.projects')}</button></li>
               <li><button onClick={() => onNavigate?.('about')} className={`text-gray-300 hover:text-white transition-colors ${language === 'en' ? 'text-left' : 'text-right'}`}>{t('footer.vision')}</button></li>
               <li><button onClick={() => onNavigate?.('contact')} className={`text-gray-300 hover:text-white transition-colors ${language === 'en' ? 'text-left' : 'text-right'}`}>{t('nav.contact')}</button></li>
             </ul>

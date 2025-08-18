@@ -5,7 +5,6 @@ import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import ServicesPage from './pages/ServicesPage';
-import ProjectsPage from './pages/ProjectsPage';
 import ContactPage from './pages/ContactPage';
 import QuoteRequestPage from './pages/QuoteRequestPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -23,8 +22,6 @@ function App() {
         return <AboutPage onNavigate={setCurrentPage} />;
       case 'services':
         return <ServicesPage onNavigate={setCurrentPage} />;
-      case 'projects':
-        return <ProjectsPage onNavigate={setCurrentPage} />;
       case 'contact':
         return <ContactPage onNavigate={setCurrentPage} />;
       case 'quote':

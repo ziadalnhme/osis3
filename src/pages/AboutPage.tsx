@@ -128,10 +128,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 المرافق الصناعية والتعليمية، مما جعلنا شريكاً موثوقاً لعملائنا.
               </p>
               <button
-                onClick={() => onNavigate('projects')}
+                onClick={() => onNavigate('services')}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300"
               >
-                اطلع على مشاريعنا
+                اطلع على خدماتنا
               </button>
             </div>
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-2xl">

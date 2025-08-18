@@ -231,10 +231,10 @@ const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
               احصل على تسعيرة مجانية
             </button>
             <button
-              onClick={() => onNavigate('projects')}
+              onClick={() => onNavigate('services')}
               className="border-2 border-white hover:bg-white hover:text-blue-900 px-10 py-4 rounded-lg font-bold transition-all duration-300"
             >
-              شاهد أعمالنا
+              تعرف على خدماتنا أكثر
             </button>
           </div>
         </div>

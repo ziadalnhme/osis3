@@ -29,7 +29,6 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onNavigate }) => {
         t('services.consulting')
       ]
     },
-    { id: 'projects', label: t('nav.projects'), icon: Users },
     { id: 'quote', label: t('nav.quote'), icon: Phone },
     { id: 'contact', label: t('nav.contact'), icon: Phone },
   ];

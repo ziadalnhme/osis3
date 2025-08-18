@@ -50,6 +50,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
   const [clientLogos, setClientLogos] = useState<any[]>([]);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [loadedProjects, setLoadedProjects] = useState([
+    {
+      id: '1',
+      title: 'مجمع الأمير السكني',
+      category: 'residential',
+      location: 'الرياض',
+      year: '2023',
+      area: '15,000 م²',
+      description: 'مجمع سكني فاخر يضم 120 وحدة سكنية مع مرافق ترفيهية ومساحات خضراء',
+      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+      services: ['التصميم المعماري', 'التصميم الإنشائي', 'أنظمة الكهروميكانيك'],
+      details: 'مشروع سكني متكامل يجمع بين التصميم العصري والطابع المعماري المحلي، مع مراعاة أعلى معايير الجودة والاستدامة البيئية.'
+    }
+  ]);
 
   // حالات التحرير
   const [editingDesignWork, setEditingDesignWork] = useState<any>(null);
@@ -57,6 +71,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [editingProject, setEditingProject] = useState<any>(null);
   const [editingClient, setEditingClient] = useState<any>(null);
   const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    category: 'residential',
+    location: '',
+    year: '',
+    area: '',
+    description: '',
+    image: '',
+    services: [''],
+    details: ''
+  });
 
   // إعدادات الحساب
   const [accountSettings, setAccountSettings] = useState({
@@ -89,6 +114,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     setFeaturedProjects(savedFeaturedProjects);
     setClientLogos(savedClientLogos);
     setTeamMembers(savedTeamMembers);
+
+    const savedProjects = getContentData('projects');
+    if (savedProjects && Array.isArray(savedProjects)) {
+      setLoadedProjects(savedProjects);
+    }
 
     // تحميل إعدادات الحساب
     const adminCredentials = getAdminCredentials_Public();
@@ -315,6 +345,45 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     } else {
       alert('فشل في تحديث البيانات');
     }
+  };
+
+  // إضافة مشروع جديد
+  const addProject = () => {
+    if (newProject.title && newProject.description) {
+      const updatedProjects = [...loadedProjects, { ...newProject, id: Date.now().toString() }];
+      setLoadedProjects(updatedProjects);
+      saveContentData('projects', updatedProjects);
+      setNewProject({
+        title: '',
+        category: 'residential',
+        location: '',
+        year: '',
+        area: '',
+        description: '',
+        image: '',
+        services: [''],
+        details: ''
+      });
+    }
+  };
+
+  // تحديث مشروع
+  const updateProject = () => {
+    if (editingProject) {
+      const updatedProjects = loadedProjects.map(project =>
+        project.id === editingProject.id ? editingProject : project
+      );
+      setLoadedProjects(updatedProjects);
+      saveContentData('projects', updatedProjects);
+      setEditingProject(null);
+    }
+  };
+
+  // حذف مشروع
+  const deleteProject = (id: string) => {
+    const updatedProjects = loadedProjects.filter(project => project.id !== id);
+    setLoadedProjects(updatedProjects);
+    saveContentData('projects', updatedProjects);
   };
 
   const renderOverview = () => (
@@ -671,6 +740,203 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <p className="text-sm text-blue-600 mb-1">{member.position}</p>
                 <p className="text-sm text-gray-600 mb-1">{member.experience}</p>
                 <p className="text-xs text-gray-500">{member.specialization}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* إدارة المشاريع */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+            <Building className="h-6 w-6 text-blue-600 ml-2" />
+            إدارة المشاريع
+          </h2>
+          
+          {/* نموذج إضافة مشروع جديد */}
+          <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">إضافة مشروع جديد</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">عنوان المشروع</label>
+                <input
+                  type="text"
+                  value={newProject.title}
+                  onChange={(e) => setNewProject({...newProject, title: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="مثال: مجمع الأمير السكني"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">فئة المشروع</label>
+                <select
+                  value={newProject.category}
+                  onChange={(e) => setNewProject({...newProject, category: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="residential">مشاريع سكنية</option>
+                  <option value="commercial">مشاريع تجارية</option>
+                  <option value="educational">مشاريع تعليمية</option>
+                  <option value="healthcare">مشاريع صحية</option>
+                  <option value="industrial">مشاريع صناعية</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
+                <input
+                  type="text"
+                  value={newProject.location}
+                  onChange={(e) => setNewProject({...newProject, location: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="مثال: الرياض"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">سنة التنفيذ</label>
+                <input
+                  type="text"
+                  value={newProject.year}
+                  onChange={(e) => setNewProject({...newProject, year: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="مثال: 2023"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
+                <input
+                  type="text"
+                  value={newProject.area}
+                  onChange={(e) => setNewProject({...newProject, area: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="مثال: 15,000 م²"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Link className="h-4 w-4 inline ml-1" />
+                  رابط الصورة
+                </label>
+                <input
+                  type="url"
+                  value={newProject.image}
+                  onChange={(e) => setNewProject({...newProject, image: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">وصف المشروع</label>
+              <textarea
+                value={newProject.description}
+                onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={3}
+                placeholder="وصف مختصر للمشروع..."
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">تفاصيل المشروع</label>
+              <textarea
+                value={newProject.details}
+                onChange={(e) => setNewProject({...newProject, details: e.target.value})}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                rows={4}
+                placeholder="تفاصيل شاملة عن المشروع..."
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">الخدمات المقدمة</label>
+              {newProject.services.map((service, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={service}
+                    onChange={(e) => {
+                      const updatedServices = [...newProject.services];
+                      updatedServices[index] = e.target.value;
+                      setNewProject({...newProject, services: updatedServices});
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="مثال: التصميم المعماري"
+                  />
+                  {newProject.services.length > 1 && (
+                    <button
+                      onClick={() => {
+                        const updatedServices = newProject.services.filter((_, i) => i !== index);
+                        setNewProject({...newProject, services: updatedServices});
+                      }}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                onClick={() => setNewProject({...newProject, services: [...newProject.services, '']})}
+                className="mt-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+              >
+                إضافة خدمة أخرى
+              </button>
+            </div>
+            <button
+              onClick={addProject}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+            >
+              إضافة المشروع
+            </button>
+          </div>
+
+          {/* عرض المشاريع */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loadedProjects.map((project) => (
+              <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden border">
+                <div className="relative h-48 overflow-hidden">
+                  {project.image ? (
+                    <img 
+                      src={project.image} 
+                      alt={project.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                      <Building className="h-16 w-16 text-white opacity-50" />
+                    </div>
+                  )}
+                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                    {project.year}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                  <p className="text-gray-600 text-sm mb-2">📍 {project.location}</p>
+                  <p className="text-gray-600 text-sm mb-2">📐 {project.area}</p>
+                  <p className="text-gray-700 text-sm mb-4 line-clamp-3">{project.description}</p>
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {project.services.slice(0, 2).map((service: string, index: number) => (
+                      <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
+                        {service}
+                      </span>
+                    ))}
+                    {project.services.length > 2 && (
+                      <span className="text-blue-600 text-xs">+{project.services.length - 2}</span>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingProject(project)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      تعديل
+                    </button>
+                    <button
+                      onClick={() => deleteProject(project.id)}
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+                    >
+                      حذف
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -1444,6 +1710,160 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
           message={selectedMessage}
           onClose={() => setSelectedMessage(null)}
         />
+      )}
+
+      {/* نافذة تعديل المشروع */}
+      {editingProject && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">تعديل المشروع</h2>
+                <button
+                  onClick={() => setEditingProject(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">عنوان المشروع</label>
+                  <input
+                    type="text"
+                    value={editingProject.title}
+                    onChange={(e) => setEditingProject({...editingProject, title: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">فئة المشروع</label>
+                  <select
+                    value={editingProject.category}
+                    onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="residential">مشاريع سكنية</option>
+                    <option value="commercial">مشاريع تجارية</option>
+                    <option value="educational">مشاريع تعليمية</option>
+                    <option value="healthcare">مشاريع صحية</option>
+                    <option value="industrial">مشاريع صناعية</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
+                  <input
+                    type="text"
+                    value={editingProject.location}
+                    onChange={(e) => setEditingProject({...editingProject, location: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">سنة التنفيذ</label>
+                  <input
+                    type="text"
+                    value={editingProject.year}
+                    onChange={(e) => setEditingProject({...editingProject, year: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
+                  <input
+                    type="text"
+                    value={editingProject.area}
+                    onChange={(e) => setEditingProject({...editingProject, area: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Link className="h-4 w-4 inline ml-1" />
+                    رابط الصورة
+                  </label>
+                  <input
+                    type="url"
+                    value={editingProject.image}
+                    onChange={(e) => setEditingProject({...editingProject, image: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">وصف المشروع</label>
+                <textarea
+                  value={editingProject.description}
+                  onChange={(e) => setEditingProject({...editingProject, description: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={3}
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">تفاصيل المشروع</label>
+                <textarea
+                  value={editingProject.details}
+                  onChange={(e) => setEditingProject({...editingProject, details: e.target.value})}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                />
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">الخدمات المقدمة</label>
+                {editingProject.services.map((service: string, index: number) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      value={service}
+                      onChange={(e) => {
+                        const updatedServices = [...editingProject.services];
+                        updatedServices[index] = e.target.value;
+                        setEditingProject({...editingProject, services: updatedServices});
+                      }}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    {editingProject.services.length > 1 && (
+                      <button
+                        onClick={() => {
+                          const updatedServices = editingProject.services.filter((_: any, i: number) => i !== index);
+                          setEditingProject({...editingProject, services: updatedServices});
+                        }}
+                        className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  onClick={() => setEditingProject({...editingProject, services: [...editingProject.services, '']})}
+                  className="mt-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                >
+                  إضافة خدمة أخرى
+                </button>
+              </div>
+              
+              <div className="flex gap-4">
+                <button
+                  onClick={updateProject}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+                >
+                  حفظ التغييرات
+                </button>
+                <button
+                  onClick={() => setEditingProject(null)}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

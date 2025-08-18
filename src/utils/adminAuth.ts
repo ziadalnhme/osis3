@@ -329,6 +329,15 @@ export const getDefaultData = () => {
         specialization: 'الهندسة المعمارية'
       }
     ],
+    heroSettings: {
+      backgroundImage: '',
+      overlayOpacity: 60,
+      gradientColors: {
+        from: 'from-blue-900',
+        via: 'via-blue-800',
+        to: 'to-blue-900'
+      }
+    },
     projects: [
       {
         id: '1',

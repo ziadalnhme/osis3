@@ -17,6 +17,15 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     engineers: 0
   });
   const [hasAnimated, setHasAnimated] = React.useState(false);
+  const [heroSettings, setHeroSettings] = React.useState({
+    backgroundImage: '',
+    overlayOpacity: 60,
+    gradientColors: {
+      from: 'from-blue-900',
+      via: 'via-blue-800',
+      to: 'to-blue-900'
+    }
+  });
 
   // Projects Gallery - moved before usage
   const projectsGallery = [
@@ -243,10 +252,33 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     // فحص دوري للتحديثات (كحل احتياطي)
     const interval = setInterval(loadData, 5000);
     
+    // تحميل إعدادات الخلفية
+    const loadHeroSettings = () => {
+      const savedHeroSettings = localStorage.getItem('content_heroSettings');
+      if (savedHeroSettings) {
+        try {
+          const parsedSettings = JSON.parse(savedHeroSettings);
+          setHeroSettings(parsedSettings);
+        } catch (error) {
+          console.error('خطأ في تحميل إعدادات الخلفية:', error);
+        }
+      }
+    };
+    
+    loadHeroSettings();
+    
+    // مراقبة تحديثات إعدادات الخلفية
+    const handleHeroSettingsUpdate = (e: CustomEvent) => {
+      setHeroSettings(e.detail);
+    };
+    
+    window.addEventListener('heroSettingsUpdated', handleHeroSettingsUpdate as EventListener);
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('contentUpdated', handleContentUpdate);
       window.removeEventListener('dataUpdated', handleDirectUpdate);
+      window.removeEventListener('heroSettingsUpdated', handleHeroSettingsUpdate as EventListener);
       clearInterval(interval);
     };
   }, []);
@@ -338,24 +370,38 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   return (
     <div className={`min-h-screen ${language === 'en' ? 'ltr' : 'rtl'}`}>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20 overflow-hidden">
+      <section className={`relative bg-gradient-to-br ${heroSettings.gradientColors.from} ${heroSettings.gradientColors.via} ${heroSettings.gradientColors.to} text-white py-20 overflow-hidden`}>
         {/* Animated Background Images */}
-        <div className="absolute inset-0 overflow-hidden">
-          {engineeringImages.map((image, index) => (
+        {heroSettings.backgroundImage ? (
+          <div className="absolute inset-0 overflow-hidden">
             <div
-              key={index}
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-0 animate-fade-in-out"
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{
-                backgroundImage: `url(${image})`,
-                animationDelay: `${index * 4}s`,
-                animationDuration: '20s'
+                backgroundImage: `url(${heroSettings.backgroundImage})`
               }}
             />
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 overflow-hidden">
+            {engineeringImages.map((image, index) => (
+              <div
+                key={index}
+                className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-0 animate-fade-in-out"
+                style={{
+                  backgroundImage: `url(${image})`,
+                  animationDelay: `${index * 4}s`,
+                  animationDuration: '20s'
+                }}
+              />
+            ))}
+          </div>
+        )}
         
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-blue-900 bg-opacity-60"></div>
+        <div 
+          className="absolute inset-0 bg-blue-900"
+          style={{ opacity: heroSettings.overlayOpacity / 100 }}
+        ></div>
         
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

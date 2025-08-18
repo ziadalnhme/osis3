@@ -1,1866 +1,1010 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Settings, 
-  Users, 
-  FileText, 
-  BarChart3, 
-  LogOut, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
-  X, 
-  Eye, 
-  MessageSquare,
-  Building,
-  Briefcase,
-  Award,
-  Home,
-  ShoppingBag,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  MapPin,
-  Link
-} from 'lucide-react';
-import { 
-  logout, 
-  getCurrentUser, 
-  saveContentData, 
-  getContentData, 
-  updateAdminCredentials,
-  verifyCurrentPassword,
-  getAdminCredentials_Public
-} from '../utils/adminAuth';
+import React from 'react';
+import { ArrowRight, CheckCircle, Users, Award, Clock, Building, MessageCircle, Eye, Target, Download, FileText, Play, Pause, Calendar, Briefcase, Home, ShoppingBag, Zap, Hammer } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
-interface AdminDashboardProps {
+interface HomePageProps {
   onNavigate: (page: string) => void;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [currentUser, setCurrentUser] = useState(getCurrentUser());
-  const [messages, setMessages] = useState<any[]>([]);
-  const [selectedMessage, setSelectedMessage] = useState<any>(null);
+const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
+  const { language, t } = useLanguage();
+  const [isGalleryPlaying, setIsGalleryPlaying] = React.useState(true);
+  const [currentProjectIndex, setCurrentProjectIndex] = React.useState(0);
+  const [animatedStats, setAnimatedStats] = React.useState({
+    projects: 0,
+    clients: 0,
+    experience: 0,
+    engineers: 0
+  });
+  const [hasAnimated, setHasAnimated] = React.useState(false);
+  const [heroSettings, setHeroSettings] = React.useState({
+    backgroundImage: '',
+    overlayOpacity: 60,
+    gradientColors: {
+      from: 'from-blue-900',
+      via: 'via-blue-800',
+      to: 'to-blue-900'
+    }
+  });
 
-  // بيانات المحتوى
-  const [designWorks, setDesignWorks] = useState<any[]>([]);
-  const [supervisionWorks, setSupervisionWorks] = useState<any[]>([]);
-  const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
-  const [clientLogos, setClientLogos] = useState<any[]>([]);
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const [loadedProjects, setLoadedProjects] = useState([
+  // Projects Gallery - moved before usage
+  const projectsGallery = [
     {
-      id: '1',
-      title: 'مجمع الأمير السكني',
-      category: 'residential',
-      location: 'الرياض',
-      year: '2023',
-      area: '15,000 م²',
-      description: 'مجمع سكني فاخر يضم 120 وحدة سكنية مع مرافق ترفيهية ومساحات خضراء',
+      id: 1,
+      title: language === 'ar' ? 'مجمع الأمير السكني' : 'Al-Amir Residential Complex',
+      category: t('gallery.residential'),
       image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-      services: ['التصميم المعماري', 'التصميم الإنشائي', 'أنظمة الكهروميكانيك'],
-      details: 'مشروع سكني متكامل يجمع بين التصميم العصري والطابع المعماري المحلي، مع مراعاة أعلى معايير الجودة والاستدامة البيئية.'
+      description: language === 'ar' ? 'مجمع سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
+    },
+    {
+      id: 2,
+      title: language === 'ar' ? 'مركز النور التجاري' : 'Al-Noor Commercial Center',
+      category: t('gallery.commercial'),
+      image: 'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مركز تجاري حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
+    },
+    {
+      id: 3,
+      title: language === 'ar' ? 'مدرسة المستقبل' : 'Future School',
+      category: t('gallery.educational'),
+      image: 'https://images.pexels.com/photos/159490/yale-university-landscape-universities-schools-159490.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مدرسة نموذجية مجهزة بأحدث التقنيات' : 'Model school equipped with latest technology'
+    },
+    {
+      id: 4,
+      title: language === 'ar' ? 'مستشفى الشفاء' : 'Al-Shifa Hospital',
+      category: t('gallery.healthcare'),
+      image: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مستشفى متخصص مجهز بأحدث المعدات' : 'Specialized hospital with latest equipment'
+    },
+    {
+      id: 5,
+      title: language === 'ar' ? 'مصنع الابتكار' : 'Innovation Factory',
+      category: t('gallery.industrial'),
+      image: 'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مصنع حديث للصناعات الغذائية' : 'Modern food industry factory'
+    },
+    {
+      id: 6,
+      title: language === 'ar' ? 'جسر الملك فهد' : 'King Fahd Bridge',
+      category: t('gallery.infrastructure'),
+      image: 'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
+      description: language === 'ar' ? 'مشروع بنية تحتية متطور' : 'Advanced infrastructure project'
     }
-  ]);
+  ];
 
-  // حالات التحرير
-  const [editingDesignWork, setEditingDesignWork] = useState<any>(null);
-  const [editingSupervisionWork, setEditingSupervisionWork] = useState<any>(null);
-  const [editingProject, setEditingProject] = useState<any>(null);
-  const [editingClient, setEditingClient] = useState<any>(null);
-  const [editingTeamMember, setEditingTeamMember] = useState<any>(null);
-  const [newProject, setNewProject] = useState({
-    title: '',
-    category: 'residential',
-    location: '',
-    year: '',
-    area: '',
-    description: '',
-    image: '',
-    services: [''],
-    details: ''
-  });
-
-  // إعدادات الحساب
-  const [accountSettings, setAccountSettings] = useState({
-    username: '',
-    email: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  // تحميل البيانات عند بدء التشغيل
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const loadAllData = () => {
-    // تحميل الرسائل
-    const savedMessages = JSON.parse(localStorage.getItem('adminMessages') || '[]');
-    setMessages(savedMessages);
-
-    // تحميل بيانات المحتوى
-    const savedDesignWorks = getContentData('designWorks') || getDefaultDesignWorks();
-    const savedSupervisionWorks = getContentData('supervisionWorks') || getDefaultSupervisionWorks();
-    const savedFeaturedProjects = getContentData('featuredProjects') || getDefaultFeaturedProjects();
-    const savedClientLogos = getContentData('clientLogos') || getDefaultClientLogos();
-    const savedTeamMembers = getContentData('teamMembers') || getDefaultTeamMembers();
-
-    setDesignWorks(savedDesignWorks);
-    setSupervisionWorks(savedSupervisionWorks);
-    setFeaturedProjects(savedFeaturedProjects);
-    setClientLogos(savedClientLogos);
-    setTeamMembers(savedTeamMembers);
-
-    const savedProjects = getContentData('projects');
-    if (savedProjects && Array.isArray(savedProjects)) {
-      setLoadedProjects(savedProjects);
-    }
-
-    // تحميل إعدادات الحساب
-    const adminCredentials = getAdminCredentials_Public();
-    setAccountSettings(prev => ({
-      ...prev,
-      username: adminCredentials.username,
-      email: adminCredentials.email
-    }));
-  };
-
-  // البيانات الافتراضية
-  const getDefaultDesignWorks = () => [
+  // Design work categories
+  const designCategories = [
     {
       id: 'villas',
       title: 'فلل وقصور',
-      icon: '🏠',
+      icon: Home,
       images: [
         'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800'
       ]
     },
     {
       id: 'commercial',
       title: 'مشاريع تجارية',
-      icon: '🏢',
+      icon: ShoppingBag,
       images: [
-        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ]
+    },
+    {
+      id: 'residential',
+      title: 'مجمعات سكنية',
+      icon: Building,
+      images: [
+        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
       ]
     }
   ];
 
-  const getDefaultSupervisionWorks = () => [
+  // Supervision work categories
+  const supervisionCategories = [
     {
       id: 'towers',
       title: 'أبراج إدارية',
-      icon: '🏗️',
+      icon: Building,
       images: [
+        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ]
+    },
+    {
+      id: 'buildings',
+      title: 'عمائر سكنية',
+      icon: Home,
+      images: [
+        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+      ]
+    },
+    {
+      id: 'mosques',
+      title: 'مساجد',
+      icon: Award,
+      images: [
+        'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800'
       ]
     }
   ];
 
-  const getDefaultFeaturedProjects = () => [
-    {
-      id: '1',
-      title: 'مجمع الأمير السكني',
-      category: 'مشاريع سكنية',
-      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: 'مجمع سكني فاخر يضم 120 وحدة سكنية'
-    }
+  // Client logos
+  const clientLogos = [
+    { name: 'شركة أرامكو السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=أرامكو' },
+    { name: 'شركة سابك', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=سابك' },
+    { name: 'شركة الراجحي', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الراجحي' },
+    { name: 'شركة الاتصالات السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=STC' },
+    { name: 'شركة المراعي', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=المراعي' },
+    { name: 'شركة الكهرباء السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الكهرباء' },
+    { name: 'شركة معادن', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=معادن' },
+    { name: 'شركة الخطوط السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الخطوط' }
   ];
 
-  const getDefaultClientLogos = () => [
-    {
-      id: '1',
-      name: 'شركة أرامكو السعودية',
-      logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=أرامكو'
-    }
-  ];
+  // تحميل البيانات من localStorage أو استخدام البيانات الافتراضية
+  const [loadedDesignCategories, setLoadedDesignCategories] = React.useState(designCategories);
+  const [loadedSupervisionCategories, setLoadedSupervisionCategories] = React.useState(supervisionCategories);
+  const [loadedProjectsGallery, setLoadedProjectsGallery] = React.useState(projectsGallery);
+  const [loadedClientLogos, setLoadedClientLogos] = React.useState(clientLogos);
 
-  const getDefaultTeamMembers = () => [
-    {
-      id: '1',
-      name: 'م. أحمد السعيد',
-      position: 'المدير العام',
-      experience: '20 سنة خبرة',
-      specialization: 'الهندسة المعمارية',
-      image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300'
-    }
-  ];
+  React.useEffect(() => {
+    // دالة تحميل البيانات
+    const loadData = () => {
+      console.log('تحميل البيانات في الصفحة الرئيسية...');
+      const savedDesignWorks = localStorage.getItem('content_designWorks');
+      const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
+      const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
+      const savedClientLogos = localStorage.getItem('content_clientLogos');
+      const savedHeroSettings = localStorage.getItem('content_heroSettings');
 
-  const handleLogout = () => {
-    logout();
-    onNavigate('home');
-  };
+      if (savedDesignWorks) {
+        try {
+          const parsedDesignWorks = JSON.parse(savedDesignWorks);
+          console.log('تم تحميل أعمال التصميم:', parsedDesignWorks);
+          setLoadedDesignCategories(parsedDesignWorks.map((work: any) => ({
+            ...work,
+            icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
+          })));
+        } catch (error) {
+          console.error('خطأ في تحميل أعمال التصميم:', error);
+        }
+      }
 
-  const handleSaveDesignWork = (work: any) => {
-    if (work.id) {
-      // تحديث موجود
-      const updated = designWorks.map(w => w.id === work.id ? work : w);
-      setDesignWorks(updated);
-      saveContentData('designWorks', updated);
-    } else {
-      // إضافة جديد
-      const newWork = { ...work, id: Date.now().toString() };
-      const updated = [...designWorks, newWork];
-      setDesignWorks(updated);
-      saveContentData('designWorks', updated);
-    }
-    setEditingDesignWork(null);
+      if (savedSupervisionWorks) {
+        try {
+          const parsedSupervisionWorks = JSON.parse(savedSupervisionWorks);
+          console.log('تم تحميل أعمال الإشراف:', parsedSupervisionWorks);
+          setLoadedSupervisionCategories(parsedSupervisionWorks.map((work: any) => ({
+            ...work,
+            icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
+          })));
+        } catch (error) {
+          console.error('خطأ في تحميل أعمال الإشراف:', error);
+        }
+      }
+
+      if (savedFeaturedProjects) {
+        try {
+          const parsedFeaturedProjects = JSON.parse(savedFeaturedProjects);
+          console.log('تم تحميل المشاريع المميزة:', parsedFeaturedProjects);
+          setLoadedProjectsGallery(parsedFeaturedProjects);
+        } catch (error) {
+          console.error('خطأ في تحميل المشاريع المميزة:', error);
+        }
+      }
+
+      if (savedClientLogos) {
+        try {
+          const parsedClientLogos = JSON.parse(savedClientLogos);
+          console.log('تم تحميل شعارات العملاء:', parsedClientLogos);
+          setLoadedClientLogos(parsedClientLogos);
+        } catch (error) {
+          console.error('خطأ في تحميل شعارات العملاء:', error);
+        }
+      }
+
+      if (savedHeroSettings) {
+        try {
+          const parsedHeroSettings = JSON.parse(savedHeroSettings);
+          console.log('تم تحميل إعدادات الخلفية:', parsedHeroSettings);
+          setHeroSettings(parsedHeroSettings);
+        } catch (error) {
+          console.error('خطأ في تحميل إعدادات الخلفية:', error);
+        }
+      }
+    };
     
-    // إشعار التحديث
-    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'designWorks' } }));
-  };
+    // تحميل البيانات عند بدء التشغيل
+    loadData();
+    
+    // مراقبة تغييرات localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      console.log('تغيير في localStorage:', e.key);
+      if (e.key && (e.key.startsWith('content_') || e.key === 'adminMessages')) {
+        loadData();
+      }
+    };
+    
+    // مراقبة الأحداث المخصصة
+    const handleContentUpdate = (e: CustomEvent) => {
+      console.log('حدث تحديث المحتوى:', e.detail);
+      loadData();
+    };
 
-  const handleSaveSupervisionWork = (work: any) => {
-    if (work.id) {
-      const updated = supervisionWorks.map(w => w.id === work.id ? work : w);
-      setSupervisionWorks(updated);
-      saveContentData('supervisionWorks', updated);
-    } else {
-      const newWork = { ...work, id: Date.now().toString() };
-      const updated = [...supervisionWorks, newWork];
-      setSupervisionWorks(updated);
-      saveContentData('supervisionWorks', updated);
+    // مراقبة تحديثات إعدادات الخلفية
+    const handleHeroSettingsUpdate = (e: CustomEvent) => {
+      console.log('تحديث إعدادات الخلفية:', e.detail);
+      setHeroSettings(e.detail);
+    };
+
+    // مراقبة تحديثات المحتوى المباشرة
+    const handleDirectUpdate = () => {
+      console.log('تحديث مباشر للمحتوى');
+      setTimeout(loadData, 100); // تأخير صغير للتأكد من حفظ البيانات
+    };
+
+    // مراقبة تغييرات localStorage
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('contentUpdated', handleContentUpdate);
+    window.addEventListener('dataUpdated', handleDirectUpdate);
+    window.addEventListener('heroSettingsUpdated', handleHeroSettingsUpdate);
+    
+    // فحص دوري للتحديثات (كحل احتياطي)
+    const interval = setInterval(loadData, 5000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('contentUpdated', handleContentUpdate);
+      window.removeEventListener('dataUpdated', handleDirectUpdate);
+      window.removeEventListener('heroSettingsUpdated', handleHeroSettingsUpdate);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const engineeringImages = [
+    'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/3862365/pexels-photo-3862365.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/3861458/pexels-photo-3861458.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    'https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=1920'
+  ];
+
+  const services = [
+    {
+      icon: Building,
+      title: t('services.architectural'),
+      description: t('services.arch.desc')
+    },
+    {
+      icon: Users,
+      title: t('services.structural'),
+      description: t('services.struct.desc')
+    },
+    {
+      icon: Award,
+      title: t('services.mep'),
+      description: t('services.mep.desc')
+    },
+    {
+      icon: Clock,
+      title: t('services.management'),
+      description: t('services.mgmt.desc')
     }
-    setEditingSupervisionWork(null);
-    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'supervisionWorks' } }));
-  };
+  ];
 
-  const handleSaveProject = (project: any) => {
-    if (project.id) {
-      const updated = featuredProjects.map(p => p.id === project.id ? project : p);
-      setFeaturedProjects(updated);
-      saveContentData('featuredProjects', updated);
-    } else {
-      const newProject = { ...project, id: Date.now().toString() };
-      const updated = [...featuredProjects, newProject];
-      setFeaturedProjects(updated);
-      saveContentData('featuredProjects', updated);
+  const stats = [
+    { number: '250+', label: t('stats.projects'), key: 'projects', target: 250, icon: Building },
+    { number: '120+', label: t('stats.clients'), key: 'clients', target: 120, icon: Users },
+    { number: '15+', label: t('stats.experience'), key: 'experience', target: 15, icon: Calendar },
+    { number: '35+', label: t('stats.engineers'), key: 'engineers', target: 35, icon: Briefcase }
+  ];
+
+  React.useEffect(() => {
+    if (isGalleryPlaying) {
+      const interval = setInterval(() => {
+        setCurrentProjectIndex((prev) => (prev + 1) % loadedProjectsGallery.length);
+      }, 4000);
+      return () => clearInterval(interval);
     }
-    setEditingProject(null);
-    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'featuredProjects' } }));
-  };
+  }, [isGalleryPlaying, loadedProjectsGallery.length]);
 
-  const handleSaveClient = (client: any) => {
-    if (client.id) {
-      const updated = clientLogos.map(c => c.id === client.id ? client : c);
-      setClientLogos(updated);
-      saveContentData('clientLogos', updated);
-    } else {
-      const newClient = { ...client, id: Date.now().toString() };
-      const updated = [...clientLogos, newClient];
-      setClientLogos(updated);
-      saveContentData('clientLogos', updated);
-    }
-    setEditingClient(null);
-    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'clientLogos' } }));
-  };
-
-  const handleSaveTeamMember = (member: any) => {
-    if (member.id) {
-      const updated = teamMembers.map(m => m.id === member.id ? member : m);
-      setTeamMembers(updated);
-      saveContentData('teamMembers', updated);
-    } else {
-      const newMember = { ...member, id: Date.now().toString() };
-      const updated = [...teamMembers, newMember];
-      setTeamMembers(updated);
-      saveContentData('teamMembers', updated);
-    }
-    setEditingTeamMember(null);
-    window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'teamMembers' } }));
-  };
-
-  const handleDeleteItem = (type: string, id: string) => {
-    if (!confirm('هل أنت متأكد من الحذف؟')) return;
-
-    switch (type) {
-      case 'designWork':
-        const updatedDesignWorks = designWorks.filter(w => w.id !== id);
-        setDesignWorks(updatedDesignWorks);
-        saveContentData('designWorks', updatedDesignWorks);
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'designWorks' } }));
-        break;
-      case 'supervisionWork':
-        const updatedSupervisionWorks = supervisionWorks.filter(w => w.id !== id);
-        setSupervisionWorks(updatedSupervisionWorks);
-        saveContentData('supervisionWorks', updatedSupervisionWorks);
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'supervisionWorks' } }));
-        break;
-      case 'project':
-        const updatedProjects = featuredProjects.filter(p => p.id !== id);
-        setFeaturedProjects(updatedProjects);
-        saveContentData('featuredProjects', updatedProjects);
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'featuredProjects' } }));
-        break;
-      case 'client':
-        const updatedClients = clientLogos.filter(c => c.id !== id);
-        setClientLogos(updatedClients);
-        saveContentData('clientLogos', updatedClients);
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'clientLogos' } }));
-        break;
-      case 'teamMember':
-        const updatedTeamMembers = teamMembers.filter(m => m.id !== id);
-        setTeamMembers(updatedTeamMembers);
-        saveContentData('teamMembers', updatedTeamMembers);
-        window.dispatchEvent(new CustomEvent('contentUpdated', { detail: { key: 'teamMembers' } }));
-        break;
-    }
-  };
-
-  const handleUpdateAccount = () => {
-    if (!accountSettings.currentPassword) {
-      alert('يرجى إدخال كلمة المرور الحالية');
-      return;
-    }
-
-    if (!verifyCurrentPassword(accountSettings.currentPassword)) {
-      alert('كلمة المرور الحالية غير صحيحة');
-      return;
-    }
-
-    if (accountSettings.newPassword && accountSettings.newPassword !== accountSettings.confirmPassword) {
-      alert('كلمة المرور الجديدة غير متطابقة');
-      return;
-    }
-
-    const success = updateAdminCredentials(
-      accountSettings.username,
-      accountSettings.newPassword || accountSettings.currentPassword,
-      accountSettings.email
+  // Animated counter effect
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasAnimated) {
+            setHasAnimated(true);
+            
+            // Animate each stat
+            stats.forEach((stat) => {
+              let current = 0;
+              const increment = stat.target / 50; // 50 steps for smooth animation
+              const timer = setInterval(() => {
+                current += increment;
+                if (current >= stat.target) {
+                  current = stat.target;
+                  clearInterval(timer);
+                }
+                setAnimatedStats(prev => ({
+                  ...prev,
+                  [stat.key]: Math.floor(current)
+                }));
+              }, 40); // 40ms interval for smooth animation
+            });
+          }
+        });
+      },
+      { threshold: 0.5 }
     );
 
-    if (success) {
-      alert('تم تحديث البيانات بنجاح');
-      setAccountSettings(prev => ({
-        ...prev,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      }));
-      setCurrentUser(getCurrentUser());
-    } else {
-      alert('فشل في تحديث البيانات');
+    const statsSection = document.getElementById('stats-section');
+    if (statsSection) {
+      observer.observe(statsSection);
     }
-  };
 
-  // إضافة مشروع جديد
-  const addProject = () => {
-    if (newProject.title && newProject.description) {
-      const updatedProjects = [...loadedProjects, { ...newProject, id: Date.now().toString() }];
-      setLoadedProjects(updatedProjects);
-      saveContentData('projects', updatedProjects);
-      setNewProject({
-        title: '',
-        category: 'residential',
-        location: '',
-        year: '',
-        area: '',
-        description: '',
-        image: '',
-        services: [''],
-        details: ''
-      });
-    }
-  };
-
-  // تحديث مشروع
-  const updateProject = () => {
-    if (editingProject) {
-      const updatedProjects = loadedProjects.map(project =>
-        project.id === editingProject.id ? editingProject : project
-      );
-      setLoadedProjects(updatedProjects);
-      saveContentData('projects', updatedProjects);
-      setEditingProject(null);
-    }
-  };
-
-  // حذف مشروع
-  const deleteProject = (id: string) => {
-    const updatedProjects = loadedProjects.filter(project => project.id !== id);
-    setLoadedProjects(updatedProjects);
-    saveContentData('projects', updatedProjects);
-  };
-
-  const renderOverview = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-blue-50 p-6 rounded-lg">
-          <div className="flex items-center">
-            <MessageSquare className="h-8 w-8 text-blue-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-bold text-blue-600">{messages.length}</p>
-              <p className="text-blue-600">الرسائل</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-green-50 p-6 rounded-lg">
-          <div className="flex items-center">
-            <Building className="h-8 w-8 text-green-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-bold text-green-600">{featuredProjects.length}</p>
-              <p className="text-green-600">المشاريع المميزة</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-yellow-50 p-6 rounded-lg">
-          <div className="flex items-center">
-            <Users className="h-8 w-8 text-yellow-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-bold text-yellow-600">{teamMembers.length}</p>
-              <p className="text-yellow-600">أعضاء الفريق</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-purple-50 p-6 rounded-lg">
-          <div className="flex items-center">
-            <Award className="h-8 w-8 text-purple-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-bold text-purple-600">{clientLogos.length}</p>
-              <p className="text-purple-600">العملاء</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">الرسائل الحديثة</h3>
-        <div className="space-y-4">
-          {messages.slice(0, 5).map((message) => (
-            <div key={message.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="font-medium">{message.name}</p>
-                <p className="text-sm text-gray-600">{message.subject}</p>
-                <p className="text-xs text-gray-500">{message.date}</p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  message.status === 'new' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                }`}>
-                  {message.status === 'new' ? 'جديد' : 'مقروء'}
-                </span>
-                <button
-                  onClick={() => setSelectedMessage(message)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderMessages = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold">الرسائل والاستفسارات</h3>
-        </div>
-        <div className="divide-y">
-          {messages.map((message) => (
-            <div key={message.id} className="p-6 hover:bg-gray-50">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <p className="font-medium text-gray-900">{message.name}</p>
-                      <p className="text-sm text-gray-600">{message.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{message.subject}</p>
-                      <p className="text-xs text-gray-500">{message.date}</p>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-700 line-clamp-2">{message.message}</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    message.status === 'new' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                  }`}>
-                    {message.status === 'new' ? 'جديد' : 'مقروء'}
-                  </span>
-                  <button
-                    onClick={() => setSelectedMessage(message)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderContentManagement = () => (
-    <div className="space-y-8">
-      {/* أعمال التصميم */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold">أعمال التصميم</h3>
-          <button
-            onClick={() => setEditingDesignWork({ title: '', icon: '🏠', images: [''] })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>إضافة جديد</span>
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {designWorks.map((work) => (
-              <div key={work.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">{work.icon}</span>
-                    <h4 className="font-medium">{work.title}</h4>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingDesignWork(work)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteItem('designWork', work.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {work.images.slice(0, 4).map((image: string, index: number) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`${work.title} ${index + 1}`}
-                      className="w-full h-20 object-cover rounded"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mt-2">{work.images.length} صورة</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* أعمال الإشراف */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold">أعمال الإشراف</h3>
-          <button
-            onClick={() => setEditingSupervisionWork({ title: '', icon: '🏗️', images: [''] })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>إضافة جديد</span>
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {supervisionWorks.map((work) => (
-              <div key={work.id} className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-2xl">{work.icon}</span>
-                    <h4 className="font-medium">{work.title}</h4>
-                  </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingSupervisionWork(work)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteItem('supervisionWork', work.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {work.images.slice(0, 4).map((image: string, index: number) => (
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`${work.title} ${index + 1}`}
-                      className="w-full h-20 object-cover rounded"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 mt-2">{work.images.length} صورة</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* المشاريع المميزة */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold">المشاريع المميزة</h3>
-          <button
-            onClick={() => setEditingProject({ title: '', category: '', image: '', description: '' })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>إضافة جديد</span>
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProjects.map((project) => (
-              <div key={project.id} className="border rounded-lg p-4">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-32 object-cover rounded mb-4"
-                />
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium">{project.title}</h4>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingProject(project)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteItem('project', project.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-sm text-blue-600 mb-2">{project.category}</p>
-                <p className="text-sm text-gray-600">{project.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* شعارات العملاء */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold">شعارات العملاء</h3>
-          <button
-            onClick={() => setEditingClient({ name: '', logo: '' })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>إضافة جديد</span>
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {clientLogos.map((client) => (
-              <div key={client.id} className="border rounded-lg p-4 text-center">
-                <img
-                  src={client.logo}
-                  alt={client.name}
-                  className="w-full h-20 object-contain mb-4"
-                />
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">{client.name}</h4>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingClient(client)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteItem('client', client.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* فريق العمل */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-lg font-semibold">فريق العمل</h3>
-          <button
-            onClick={() => setEditingTeamMember({ name: '', position: '', experience: '', specialization: '', image: '' })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <Plus className="h-4 w-4" />
-            <span>إضافة جديد</span>
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {teamMembers.map((member) => (
-              <div key={member.id} className="border rounded-lg p-4">
-                <img
-                  src={member.image || 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300'}
-                  alt={member.name}
-                  className="w-full h-32 object-cover rounded mb-4"
-                />
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium">{member.name}</h4>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => setEditingTeamMember(member)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteItem('teamMember', member.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-sm text-blue-600 mb-1">{member.position}</p>
-                <p className="text-sm text-gray-600 mb-1">{member.experience}</p>
-                <p className="text-xs text-gray-500">{member.specialization}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* إدارة المشاريع */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-            <Building className="h-6 w-6 text-blue-600 ml-2" />
-            إدارة المشاريع
-          </h2>
-          
-          {/* نموذج إضافة مشروع جديد */}
-          <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">إضافة مشروع جديد</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">عنوان المشروع</label>
-                <input
-                  type="text"
-                  value={newProject.title}
-                  onChange={(e) => setNewProject({...newProject, title: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="مثال: مجمع الأمير السكني"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">فئة المشروع</label>
-                <select
-                  value={newProject.category}
-                  onChange={(e) => setNewProject({...newProject, category: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="residential">مشاريع سكنية</option>
-                  <option value="commercial">مشاريع تجارية</option>
-                  <option value="educational">مشاريع تعليمية</option>
-                  <option value="healthcare">مشاريع صحية</option>
-                  <option value="industrial">مشاريع صناعية</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
-                <input
-                  type="text"
-                  value={newProject.location}
-                  onChange={(e) => setNewProject({...newProject, location: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="مثال: الرياض"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">سنة التنفيذ</label>
-                <input
-                  type="text"
-                  value={newProject.year}
-                  onChange={(e) => setNewProject({...newProject, year: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="مثال: 2023"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
-                <input
-                  type="text"
-                  value={newProject.area}
-                  onChange={(e) => setNewProject({...newProject, area: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="مثال: 15,000 م²"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Link className="h-4 w-4 inline ml-1" />
-                  رابط الصورة
-                </label>
-                <input
-                  type="url"
-                  value={newProject.image}
-                  onChange={(e) => setNewProject({...newProject, image: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">وصف المشروع</label>
-              <textarea
-                value={newProject.description}
-                onChange={(e) => setNewProject({...newProject, description: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={3}
-                placeholder="وصف مختصر للمشروع..."
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">تفاصيل المشروع</label>
-              <textarea
-                value={newProject.details}
-                onChange={(e) => setNewProject({...newProject, details: e.target.value})}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={4}
-                placeholder="تفاصيل شاملة عن المشروع..."
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">الخدمات المقدمة</label>
-              {newProject.services.map((service, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={service}
-                    onChange={(e) => {
-                      const updatedServices = [...newProject.services];
-                      updatedServices[index] = e.target.value;
-                      setNewProject({...newProject, services: updatedServices});
-                    }}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="مثال: التصميم المعماري"
-                  />
-                  {newProject.services.length > 1 && (
-                    <button
-                      onClick={() => {
-                        const updatedServices = newProject.services.filter((_, i) => i !== index);
-                        setNewProject({...newProject, services: updatedServices});
-                      }}
-                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                onClick={() => setNewProject({...newProject, services: [...newProject.services, '']})}
-                className="mt-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-              >
-                إضافة خدمة أخرى
-              </button>
-            </div>
-            <button
-              onClick={addProject}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
-            >
-              إضافة المشروع
-            </button>
-          </div>
-
-          {/* عرض المشاريع */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loadedProjects.map((project) => (
-              <div key={project.id} className="bg-white rounded-xl shadow-lg overflow-hidden border">
-                <div className="relative h-48 overflow-hidden">
-                  {project.image ? (
-                    <img 
-                      src={project.image} 
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
-                      <Building className="h-16 w-16 text-white opacity-50" />
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
-                    {project.year}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">📍 {project.location}</p>
-                  <p className="text-gray-600 text-sm mb-2">📐 {project.area}</p>
-                  <p className="text-gray-700 text-sm mb-4 line-clamp-3">{project.description}</p>
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {project.services.slice(0, 2).map((service: string, index: number) => (
-                      <span key={index} className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs">
-                        {service}
-                      </span>
-                    ))}
-                    {project.services.length > 2 && (
-                      <span className="text-blue-600 text-xs">+{project.services.length - 2}</span>
+    return () => observer.disconnect();
+  }, [hasAnimated, stats]);
+  return (
+    <div className={`min-h-screen ${language === 'en' ? 'ltr' : 'rtl'}`}>
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20 overflow-hidden">
+        {/* Animated Background Images */}
+                animationDelay: `${index * 4}s`,
+                          alt="صورة الخلفية" 
+                          className="w-16 h-16 object-cover rounded-lg"
+                        />
+                        <span className="text-gray-700 text-sm">{heroSettings.backgroundImage}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-500">لا توجد صورة خلفية محددة</span>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setEditingProject(project)}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-                    >
-                      تعديل
-                    </button>
-                    <button
-                      onClick={() => deleteProject(project.id)}
-                      className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-                    >
-                      حذف
-                    </button>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">شفافية الطبقة العلوية</label>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <span className="text-gray-700">{heroSettings.overlayOpacity}%</span>
                   </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">ألوان التدرج</label>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="flex space-x-2">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{heroSettings.gradientColors.from}</span>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{heroSettings.gradientColors.via}</span>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">{heroSettings.gradientColors.to}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+                animationDuration: '20s'
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-blue-900 bg-opacity-60"></div>
+        
+        {/* Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                {language === 'ar' ? (
+                  <>شركة <span className="text-yellow-400">أسس الأعمار</span><br />للاستشارات الهندسية</>
+                ) : (
+                  <><span className="text-yellow-400">Osos Al-Imar</span><br />Engineering Consultancy</>
+                )}
+              </h1>
+              <p className="text-lg text-blue-100 mb-8 leading-relaxed">
+                {t('home.hero.subtitle')}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => onNavigate('quote')}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+                >
+                  <span>{t('home.hero.quote')}</span>
+                  <ArrowRight className={`h-5 w-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+                </button>
+                <button
+                  onClick={() => onNavigate('contact')}
+                  className="border-2 border-white hover:bg-white hover:text-blue-900 px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+                >
+                  {t('home.hero.contact')}
+                </button>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                <h3 className="text-xl font-bold mb-6 text-center">{t('home.hero.why')}</h3>
+                <div className="space-y-4">
+                  {[
+                    t('home.hero.experience'),
+                    t('home.hero.team'),
+                    t('home.hero.technology'),
+                    t('home.hero.quality')
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <CheckCircle className="h-5 w-5 text-yellow-400 flex-shrink-0" />
+                      <span className="text-blue-100">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section id="stats-section" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center relative z-10">
+                <div className="relative mx-auto mb-6 w-24 h-24 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl transform hover:scale-110 hover:rotate-6 transition-all duration-500 shadow-xl hover:shadow-2xl flex flex-col items-center justify-center text-white group animate-pulse-glow">
+                  {/* Icon */}
+                  <stat.icon className="h-6 w-6 mb-1 group-hover:scale-125 transition-transform duration-300 animate-icon-float group-hover:animate-spin" />
+                  {/* Number */}
+                  <span className="text-lg font-bold">
+                    {animatedStats[stat.key as keyof typeof animatedStats]}+
+                  </span>
+                  
+                  {/* Floating particles effect */}
+                  <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                    <div className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full opacity-60 animate-ping animation-delay-100"></div>
+                    <div className="absolute bottom-1 left-1 w-1.5 h-1.5 bg-yellow-300 rounded-full opacity-80 animate-bounce animation-delay-300"></div>
+                    <div className="absolute top-3 left-2 w-1 h-1 bg-yellow-200 rounded-full opacity-70 animate-pulse animation-delay-500"></div>
+                    <div className="absolute bottom-3 right-2 w-0.5 h-0.5 bg-white rounded-full opacity-50 animate-ping animation-delay-700"></div>
+                  </div>
+                  
+                  {/* Rotating ring effect */}
+                  <div className="absolute inset-0 border-2 border-yellow-400 rounded-2xl opacity-0 group-hover:opacity-30 animate-spin transition-opacity duration-500"></div>
+                  <div className="absolute inset-2 border border-white rounded-xl opacity-20 animate-pulse"></div>
+                </div>
+                <p className="text-gray-700 font-semibold hover:text-blue-600 transition-colors duration-300">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Design Work Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">أعمالنا في التصميم</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              نفخر بتقديم تصاميم معمارية مبتكرة ومتنوعة تلبي احتياجات عملائنا
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {loadedDesignCategories.map((category, index) => (
+              <div key={category.id} className="bg-gray-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="bg-blue-600 text-white p-3 rounded-lg ml-3">
+                      {React.createElement(category.icon, { className: "h-6 w-6" })}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
+                  </div>
+                </div>
+                <div className="relative h-48 overflow-hidden">
+                  {category.images.map((image, imgIndex) => (
+                    <img
+                      key={imgIndex}
+                      src={image}
+                      alt={`${category.title} ${imgIndex + 1}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                        imgIndex === 0 ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      style={{
+                        animationDelay: `${imgIndex * 3}s`,
+                        animation: `fadeInOut 12s infinite ${imgIndex * 3}s`
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
-  );
+      </section>
 
-  const renderSettings = () => (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold">إعدادات الحساب</h3>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                اسم المستخدم
-              </label>
-              <input
-                type="text"
-                value={accountSettings.username}
-                onChange={(e) => setAccountSettings(prev => ({ ...prev, username: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                البريد الإلكتروني
-              </label>
-              <input
-                type="email"
-                value={accountSettings.email}
-                onChange={(e) => setAccountSettings(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                كلمة المرور الحالية *
-              </label>
-              <input
-                type="password"
-                value={accountSettings.currentPassword}
-                onChange={(e) => setAccountSettings(prev => ({ ...prev, currentPassword: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="مطلوبة للتأكيد"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                كلمة المرور الجديدة (اختياري)
-              </label>
-              <input
-                type="password"
-                value={accountSettings.newPassword}
-                onChange={(e) => setAccountSettings(prev => ({ ...prev, newPassword: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="اتركها فارغة إذا لم ترد التغيير"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                تأكيد كلمة المرور الجديدة
-              </label>
-              <input
-                type="password"
-                value={accountSettings.confirmPassword}
-                onChange={(e) => setAccountSettings(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="تأكيد كلمة المرور الجديدة"
-              />
-            </div>
-          </div>
-          <div className="mt-6">
-            <button
-              onClick={handleUpdateAccount}
-              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ التغييرات</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // مكونات التحرير
-  const DesignWorkEditor = ({ work, onSave, onCancel }: any) => {
-    const [formData, setFormData] = useState(work);
-
-    const handleImageChange = (index: number, value: string) => {
-      const newImages = [...formData.images];
-      newImages[index] = value;
-      setFormData({ ...formData, images: newImages });
-    };
-
-    const addImageField = () => {
-      setFormData({ ...formData, images: [...formData.images, ''] });
-    };
-
-    const removeImageField = (index: number) => {
-      const newImages = formData.images.filter((_: any, i: number) => i !== index);
-      setFormData({ ...formData, images: newImages });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              {work.id ? 'تحرير عمل التصميم' : 'إضافة عمل تصميم جديد'}
-            </h3>
-            <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">العنوان</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الأيقونة</label>
-              <input
-                type="text"
-                value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="🏠"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">روابط الصور</label>
-              {formData.images.map((image: string, index: number) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <Link className="h-4 w-4 text-gray-400" />
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.images.length > 1 && (
-                    <button
-                      onClick={() => removeImageField(index)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                onClick={addImageField}
-                className="text-blue-600 hover:text-blue-800 text-sm flex items-center space-x-1"
-              >
-                <Plus className="h-4 w-4" />
-                <span>إضافة صورة أخرى</span>
-              </button>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={() => onSave(formData)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const SupervisionWorkEditor = ({ work, onSave, onCancel }: any) => {
-    const [formData, setFormData] = useState(work);
-
-    const handleImageChange = (index: number, value: string) => {
-      const newImages = [...formData.images];
-      newImages[index] = value;
-      setFormData({ ...formData, images: newImages });
-    };
-
-    const addImageField = () => {
-      setFormData({ ...formData, images: [...formData.images, ''] });
-    };
-
-    const removeImageField = (index: number) => {
-      const newImages = formData.images.filter((_: any, i: number) => i !== index);
-      setFormData({ ...formData, images: newImages });
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              {work.id ? 'تحرير عمل الإشراف' : 'إضافة عمل إشراف جديد'}
-            </h3>
-            <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">العنوان</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الأيقونة</label>
-              <input
-                type="text"
-                value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="🏗️"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">روابط الصور</label>
-              {formData.images.map((image: string, index: number) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <Link className="h-4 w-4 text-gray-400" />
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.images.length > 1 && (
-                    <button
-                      onClick={() => removeImageField(index)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                onClick={addImageField}
-                className="text-blue-600 hover:text-blue-800 text-sm flex items-center space-x-1"
-              >
-                <Plus className="h-4 w-4" />
-                <span>إضافة صورة أخرى</span>
-              </button>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={() => onSave(formData)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const ProjectEditor = ({ project, onSave, onCancel }: any) => {
-    const [formData, setFormData] = useState(project);
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              {project.id ? 'تحرير المشروع' : 'إضافة مشروع جديد'}
-            </h3>
-            <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">عنوان المشروع</label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الفئة</label>
-              <input
-                type="text"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="مشاريع سكنية"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
-              <div className="flex items-center space-x-2">
-                <Link className="h-4 w-4 text-gray-400" />
-                <input
-                  type="url"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={() => onSave(formData)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const ClientEditor = ({ client, onSave, onCancel }: any) => {
-    const [formData, setFormData] = useState(client);
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              {client.id ? 'تحرير العميل' : 'إضافة عميل جديد'}
-            </h3>
-            <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">اسم العميل</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">رابط الشعار</label>
-              <div className="flex items-center space-x-2">
-                <Link className="h-4 w-4 text-gray-400" />
-                <input
-                  type="url"
-                  value={formData.logo}
-                  onChange={(e) => setFormData({ ...formData, logo: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={() => onSave(formData)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const TeamMemberEditor = ({ member, onSave, onCancel }: any) => {
-    const [formData, setFormData] = useState(member);
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
-              {member.id ? 'تحرير عضو الفريق' : 'إضافة عضو جديد'}
-            </h3>
-            <button onClick={onCancel} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الاسم</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">المنصب</label>
-              <input
-                type="text"
-                value={formData.position}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">سنوات الخبرة</label>
-              <input
-                type="text"
-                value={formData.experience}
-                onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="15 سنة خبرة"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">التخصص</label>
-              <input
-                type="text"
-                value={formData.specialization}
-                onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="الهندسة المعمارية"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">رابط الصورة</label>
-              <div className="flex items-center space-x-2">
-                <Link className="h-4 w-4 text-gray-400" />
-                <input
-                  type="url"
-                  value={formData.image || ''}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="https://example.com/photo.jpg"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-4 mt-6">
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-            >
-              إلغاء
-            </button>
-            <button
-              onClick={() => onSave(formData)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
-            >
-              <Save className="h-4 w-4" />
-              <span>حفظ</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const MessageModal = ({ message, onClose }: any) => {
-    if (!message) return null;
-
-    const markAsRead = () => {
-      const updatedMessages = messages.map(m => 
-        m.id === message.id ? { ...m, status: 'read' } : m
-      );
-      setMessages(updatedMessages);
-      localStorage.setItem('adminMessages', JSON.stringify(updatedMessages));
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">تفاصيل الرسالة</h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">الاسم</label>
-                <p className="text-gray-900">{message.name}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">البريد الإلكتروني</label>
-                <p className="text-gray-900">{message.email}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">الهاتف</label>
-                <p className="text-gray-900">{message.phone}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">التاريخ</label>
-                <p className="text-gray-900">{message.date}</p>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700">الموضوع</label>
-              <p className="text-gray-900">{message.subject}</p>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700">الرسالة</label>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-900 whitespace-pre-wrap">{message.message}</p>
-              </div>
-            </div>
-
-            {message.type === 'quote' && message.projectDetails && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">تفاصيل المشروع</label>
-                <div className="bg-blue-50 p-4 rounded-lg space-y-2">
-                  <p><strong>نوع المشروع:</strong> {message.projectDetails.projectType}</p>
-                  <p><strong>الموقع:</strong> {message.projectDetails.projectLocation}</p>
-                  <p><strong>مساحة الأرض:</strong> {message.projectDetails.plotArea} م²</p>
-                  <p><strong>مساحة البناء:</strong> {message.projectDetails.buildingArea} م²</p>
-                  <p><strong>الميزانية:</strong> {message.projectDetails.budget}</p>
-                  <p><strong>الإطار الزمني:</strong> {message.projectDetails.timeline}</p>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex justify-between mt-6">
-            <div className="flex space-x-2">
-              <a
-                href={`tel:${message.phone}`}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center space-x-2"
-              >
-                <Phone className="h-4 w-4" />
-                <span>اتصال</span>
-              </a>
-              <a
-                href={`mailto:${message.email}`}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
-              >
-                <Mail className="h-4 w-4" />
-                <span>إيميل</span>
-              </a>
-            </div>
-            <div className="flex space-x-2">
-              {message.status === 'new' && (
-                <button
-                  onClick={markAsRead}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-                >
-                  تم القراءة
-                </button>
-              )}
-              <button
-                onClick={onClose}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                إغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const tabs = [
-    { id: 'overview', label: 'نظرة عامة', icon: BarChart3 },
-    { id: 'messages', label: 'الرسائل', icon: MessageSquare },
-    { id: 'content', label: 'إدارة المحتوى', icon: FileText },
-    { id: 'settings', label: 'الإعدادات', icon: Settings },
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      {/* Our Supervision Work Section */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-600 text-white p-2 rounded-lg">
-                <Settings className="h-6 w-6" />
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">أعمالنا في الإشراف</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              نقدم خدمات إشراف هندسي متميزة لضمان تنفيذ المشاريع وفقاً لأعلى المعايير
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {loadedSupervisionCategories.map((category, index) => (
+              <div key={category.id} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="bg-yellow-500 text-white p-3 rounded-lg ml-3">
+                      {React.createElement(category.icon, { className: "h-6 w-6" })}
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
+                  </div>
+                </div>
+                <div className="relative h-48 overflow-hidden">
+                  {category.images.map((image, imgIndex) => (
+                    <img
+                      key={imgIndex}
+                      src={image}
+                      alt={`${category.title} ${imgIndex + 1}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                        imgIndex === 0 ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      style={{
+                        animationDelay: `${imgIndex * 3}s`,
+                        animation: `fadeInOut 12s infinite ${imgIndex * 3}s`
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">لوحة التحكم</h1>
-                <p className="text-sm text-gray-600">أسس الأعمار للاستشارات الهندسية</p>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Vision & Goals Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{t('vision.title')}</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              {t('vision.subtitle')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Vision */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-blue-600 text-white p-3 rounded-full ml-4">
+                  <Eye className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">{t('vision.our')}</h3>
               </div>
+              <p className="text-gray-700 leading-relaxed">
+                {t('vision.text')}
+              </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">مرحباً، {currentUser?.username}</p>
-                <p className="text-xs text-gray-600">{currentUser?.email}</p>
+
+            {/* Goals */}
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-8">
+              <div className="flex items-center mb-6">
+                <div className="bg-yellow-500 text-white p-3 rounded-full ml-4">
+                  <Target className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">{t('goals.our')}</h3>
               </div>
-              <button
-                onClick={() => onNavigate('home')}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                عرض الموقع
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 flex items-center space-x-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>تسجيل الخروج</span>
-              </button>
+              <div className="space-y-4">
+                {[
+                  t('goals.leadership'),
+                  t('goals.development'),
+                  t('goals.innovation'),
+                  t('goals.vision2030'),
+                  t('goals.partnerships')
+                ].map((goal, index) => (
+                  <div key={index} className="flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-1" />
+                    <span className="text-gray-700">{goal}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex">
-          {/* Sidebar */}
-          <div className="w-64 bg-white rounded-lg shadow p-6 ml-8">
-            <nav className="space-y-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-right transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-blue-50 text-blue-600 border-r-2 border-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50'
+      {/* Animated Projects Gallery */}
+      <section className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('gallery.title')}</h2>
+            <p className="text-lg text-blue-100 max-w-3xl mx-auto">
+              {t('gallery.subtitle')}
+            </p>
+          </div>
+          
+          <div className="relative">
+            {/* Main Gallery Display */}
+            <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+              {loadedProjectsGallery.map((project, index) => (
+                <div
+                  key={project.id}
+                  className={`absolute inset-0 transition-all duration-1000 ${
+                    index === currentProjectIndex 
+                      ? 'opacity-100 scale-100' 
+                      : 'opacity-0 scale-105'
                   }`}
                 >
-                  <tab.icon className="h-5 w-5" />
-                  <span>{tab.label}</span>
-                  {tab.id === 'messages' && messages.filter(m => m.status === 'new').length > 0 && (
-                    <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 mr-auto">
-                      {messages.filter(m => m.status === 'new').length}
-                    </span>
-                  )}
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-8">
+                    <div className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm inline-block mb-4">
+                      {project.category}
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-2">{project.title}</h3>
+                    <p className="text-blue-100">{project.description}</p>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Play/Pause Button */}
+              <button
+                onClick={() => setIsGalleryPlaying(!isGalleryPlaying)}
+                className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300"
+              >
+                {isGalleryPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+              </button>
+            </div>
+
+            {/* Thumbnails */}
+            <div className="flex justify-center mt-8 space-x-4 overflow-x-auto pb-4">
+              {loadedProjectsGallery.map((project, index) => (
+                <button
+                  key={project.id}
+                  onClick={() => setCurrentProjectIndex(index)}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                    index === currentProjectIndex
+                      ? 'border-yellow-400 scale-110'
+                      : 'border-transparent hover:border-blue-400'
+                  }`}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
-            </nav>
+            </div>
+
+            {/* Progress Indicators */}
+            <div className="flex justify-center mt-6 space-x-2">
+              {loadedProjectsGallery.map((_, index) => (
+                <div
+                  key={index}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentProjectIndex
+                      ? 'w-8 bg-yellow-400'
+                      : 'w-2 bg-gray-600 hover:bg-blue-400'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* Main Content */}
-          <div className="flex-1">
-            <div className="bg-white rounded-lg shadow">
-              <div className="p-6">
-                {activeTab === 'overview' && renderOverview()}
-                {activeTab === 'messages' && renderMessages()}
-                {activeTab === 'content' && renderContentManagement()}
-                {activeTab === 'settings' && renderSettings()}
+        </div>
+      </section>
+
+      {/* Company Profile Download Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="bg-white rounded-2xl shadow-xl p-12 max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-6 rounded-full inline-block mb-8">
+                <img 
+                  src="/شعار اسس الاعمار المتقدمة-0١.svg" 
+                  alt="شعار الشركة" 
+                  className="h-12 w-12 object-contain"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+                <FileText className="h-12 w-12 hidden" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{t('profile.title')}</h2>
+              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+                {t('profile.subtitle')}
+              </p>
+              <p className="text-gray-700 mb-8 max-w-3xl mx-auto">
+                {t('profile.description')}
+              </p>
+              <button
+                onClick={() => {
+                  window.open('https://drive.google.com/file/d/12kL0cCvkybGzv1YvWveIqIIryYVGMHKY/view?usp=sharing', '_blank');
+                }}
+                className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-10 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 inline-flex items-center space-x-3"
+              >
+                <Download className="h-6 w-6" />
+                <span>{t('profile.download')}</span>
+              </button>
+              <div className="mt-6 text-sm text-gray-500">
+                PDF • {language === 'ar' ? 'حجم الملف: 2.5 ميجابايت' : 'File size: 2.5 MB'}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Modals */}
-      {editingDesignWork && (
-        <DesignWorkEditor
-          work={editingDesignWork}
-          onSave={handleSaveDesignWork}
-          onCancel={() => setEditingDesignWork(null)}
-        />
-      )}
+      {/* Services Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{t('services.title')}</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              {t('services.subtitle')}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group"
+              >
+                <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-3 rounded-lg inline-block mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <service.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">{service.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{service.description}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-12">
+            <button
+              onClick={() => onNavigate('quote')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300 inline-flex items-center space-x-2"
+            >
+              <span>{t('home.hero.quote')}</span>
+              <ArrowRight className={`h-5 w-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+        </div>
+      </section>
 
-      {editingSupervisionWork && (
-        <SupervisionWorkEditor
-          work={editingSupervisionWork}
-          onSave={handleSaveSupervisionWork}
-          onCancel={() => setEditingSupervisionWork(null)}
-        />
-      )}
+      {/* Our Clients Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">عملاؤنا</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              نفخر بثقة كبرى الشركات والمؤسسات في المملكة العربية السعودية
+            </p>
+          </div>
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll">
+              {[...loadedClientLogos, ...loadedClientLogos].map((client, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 mx-8 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-4"
+                  style={{ minWidth: '180px' }}
+                >
+                  <img
+                    src={client.logo}
+                    alt={client.name}
+                    className="w-full h-16 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-      {editingProject && (
-        <ProjectEditor
-          project={editingProject}
-          onSave={handleSaveProject}
-          onCancel={() => setEditingProject(null)}
-        />
-      )}
-
-      {editingClient && (
-        <ClientEditor
-          client={editingClient}
-          onSave={handleSaveClient}
-          onCancel={() => setEditingClient(null)}
-        />
-      )}
-
-      {editingTeamMember && (
-        <TeamMemberEditor
-          member={editingTeamMember}
-          onSave={handleSaveTeamMember}
-          onCancel={() => setEditingTeamMember(null)}
-        />
-      )}
-
-      {selectedMessage && (
-        <MessageModal
-          message={selectedMessage}
-          onClose={() => setSelectedMessage(null)}
-        />
-      )}
-
-      {/* نافذة تعديل المشروع */}
-      {editingProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">تعديل المشروع</h2>
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">{t('cta.title')}</h2>
+          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
+            {t('cta.subtitle')}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={() => onNavigate('quote')}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black px-10 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105"
+            >
+              {t('cta.consultation')}
+            </button>
+            <button
+              onClick={() => window.open('https://wa.me/966559299897')}
+              className="bg-green-500 hover:bg-green-600 text-white px-10 py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+            >
+              <MessageCircle className="h-6 w-6" />
+              <span>{t('cta.whatsapp')}</span>
+            </button>
+          </div>
+        </div>
+      </section>
+      {/* Hero Settings Modal */}
+      {isHeroModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-bold text-gray-900">تعديل إعدادات الخلفية</h3>
                 <button
-                  onClick={() => setEditingProject(null)}
-                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => setIsHeroModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">عنوان المشروع</label>
-                  <input
-                    type="text"
-                    value={editingProject.title}
-                    onChange={(e) => setEditingProject({...editingProject, title: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">فئة المشروع</label>
-                  <select
-                    value={editingProject.category}
-                    onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="residential">مشاريع سكنية</option>
-                    <option value="commercial">مشاريع تجارية</option>
-                    <option value="educational">مشاريع تعليمية</option>
-                    <option value="healthcare">مشاريع صحية</option>
-                    <option value="industrial">مشاريع صناعية</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">الموقع</label>
-                  <input
-                    type="text"
-                    value={editingProject.location}
-                    onChange={(e) => setEditingProject({...editingProject, location: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">سنة التنفيذ</label>
-                  <input
-                    type="text"
-                    value={editingProject.year}
-                    onChange={(e) => setEditingProject({...editingProject, year: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">المساحة</label>
-                  <input
-                    type="text"
-                    value={editingProject.area}
-                    onChange={(e) => setEditingProject({...editingProject, area: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Link className="h-4 w-4 inline ml-1" />
-                    رابط الصورة
-                  </label>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  رابط صورة الخلفية
+                </label>
+                <div className="relative">
                   <input
                     type="url"
-                    value={editingProject.image}
-                    onChange={(e) => setEditingProject({...editingProject, image: e.target.value})}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={heroSettings.backgroundImage}
+                    onChange={(e) => setHeroSettings(prev => ({
+                      ...prev,
+                      backgroundImage: e.target.value
+                    }))}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-10"
+                    placeholder="https://example.com/image.jpg"
                   />
+                  <Link className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
+                </div>
+                {heroSettings.backgroundImage && (
+                  <div className="mt-3">
+                    <img 
+                      src={heroSettings.backgroundImage} 
+                      alt="معاينة الخلفية" 
+                      className="w-full h-32 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  شفافية الطبقة العلوية ({heroSettings.overlayOpacity}%)
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={heroSettings.overlayOpacity}
+                  onChange={(e) => setHeroSettings(prev => ({
+                    ...prev,
+                    overlayOpacity: parseInt(e.target.value)
+                  }))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>شفاف</span>
+                  <span>معتم</span>
                 </div>
               </div>
               
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">وصف المشروع</label>
-                <textarea
-                  value={editingProject.description}
-                  onChange={(e) => setEditingProject({...editingProject, description: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={3}
-                />
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">تفاصيل المشروع</label>
-                <textarea
-                  value={editingProject.details}
-                  onChange={(e) => setEditingProject({...editingProject, details: e.target.value})}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={4}
-                />
-              </div>
-              
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">الخدمات المقدمة</label>
-                {editingProject.services.map((service: string, index: number) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <input
-                      type="text"
-                      value={service}
-                      onChange={(e) => {
-                        const updatedServices = [...editingProject.services];
-                        updatedServices[index] = e.target.value;
-                        setEditingProject({...editingProject, services: updatedServices});
-                      }}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    {editingProject.services.length > 1 && (
-                      <button
-                        onClick={() => {
-                          const updatedServices = editingProject.services.filter((_: any, i: number) => i !== index);
-                          setEditingProject({...editingProject, services: updatedServices});
-                        }}
-                        className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-4">ألوان التدرج</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">اللون الأول</label>
+                    <select
+                      value={heroSettings.gradientColors.from}
+                      onChange={(e) => setHeroSettings(prev => ({
+                        ...prev,
+                        gradientColors: {
+                          ...prev.gradientColors,
+                          from: e.target.value
+                        }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    >
+                      <option value="from-blue-900">أزرق داكن</option>
+                      <option value="from-gray-900">رمادي داكن</option>
+                      <option value="from-green-900">أخضر داكن</option>
+                      <option value="from-purple-900">بنفسجي داكن</option>
+                      <option value="from-red-900">أحمر داكن</option>
+                    </select>
                   </div>
-                ))}
-                <button
-                  onClick={() => setEditingProject({...editingProject, services: [...editingProject.services, '']})}
-                  className="mt-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
-                >
-                  إضافة خدمة أخرى
-                </button>
+                  
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">اللون الأوسط</label>
+                    <select
+                      value={heroSettings.gradientColors.via}
+                      onChange={(e) => setHeroSettings(prev => ({
+                        ...prev,
+                        gradientColors: {
+                          ...prev.gradientColors,
+                          via: e.target.value
+                        }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    >
+                      <option value="via-blue-800">أزرق متوسط</option>
+                      <option value="via-gray-800">رمادي متوسط</option>
+                      <option value="via-green-800">أخضر متوسط</option>
+                      <option value="via-purple-800">بنفسجي متوسط</option>
+                      <option value="via-red-800">أحمر متوسط</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">اللون الأخير</label>
+                    <select
+                      value={heroSettings.gradientColors.to}
+                      onChange={(e) => setHeroSettings(prev => ({
+                        ...prev,
+                        gradientColors: {
+                          ...prev.gradientColors,
+                          to: e.target.value
+                        }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    >
+                      <option value="to-blue-900">أزرق داكن</option>
+                      <option value="to-gray-900">رمادي داكن</option>
+                      <option value="to-green-900">أخضر داكن</option>
+                      <option value="to-purple-900">بنفسجي داكن</option>
+                      <option value="to-red-900">أحمر داكن</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               
-              <div className="flex gap-4">
-                <button
-                  onClick={updateProject}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-                >
-                  حفظ التغييرات
-                </button>
-                <button
-                  onClick={() => setEditingProject(null)}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors"
-                >
-                  إلغاء
-                </button>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">معاينة التدرج</h4>
+                <div 
+                  className={`h-16 rounded-lg bg-gradient-to-br ${heroSettings.gradientColors.from} ${heroSettings.gradientColors.via} ${heroSettings.gradientColors.to}`}
+                ></div>
               </div>
+            </div>
+            
+            <div className="p-6 border-t border-gray-200 flex justify-end space-x-4">
+              <button
+                onClick={() => setIsHeroModalOpen(false)}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={() => {
+                  updateHeroSettings(heroSettings);
+                  setIsHeroModalOpen(false);
+                }}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                حفظ التغييرات
+              </button>
             </div>
           </div>
         </div>
@@ -1869,4 +1013,4 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   );
 };
 
-export default AdminDashboard;
+export default HomePage;

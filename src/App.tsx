@@ -28,7 +28,9 @@ function App() {
       case 'quote':
         return <QuoteRequestPage onNavigate={setCurrentPage} />;
       case 'admin':
-        return isLoggedIn() ? <AdminDashboard onNavigate={setCurrentPage} /> : <AdminLogin onNavigate={setCurrentPage} />;
+        // التحقق من تسجيل الدخول من localStorage أيضاً
+        const isAdminLoggedIn = isLoggedIn() || localStorage.getItem('adminLoggedIn') === 'true';
+        return isAdminLoggedIn ? <AdminDashboard onNavigate={setCurrentPage} /> : <AdminLogin onNavigate={setCurrentPage} />;
       default:
         return <HomePage onNavigate={setCurrentPage} />;
     }

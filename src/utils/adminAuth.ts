@@ -31,7 +31,8 @@ const saveAdminCredentials = (admin: AdminUser): void => {
 // فحص تسجيل الدخول
 export const isLoggedIn = (): boolean => {
   const user = localStorage.getItem('adminUser');
-  return !!user;
+  const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+  return !!(user || adminLoggedIn === 'true');
 };
 
 // الحصول على بيانات المستخدم الحالي

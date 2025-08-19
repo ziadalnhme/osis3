@@ -190,9 +190,9 @@ const getDefaultContent = (): ContentData => {
     designWorks: [
       {
         id: 'villas',
-        title: 'فلل وقصور',
+        title: 'فلل 33',
         icon: '🏠',
-        images: ['https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800']
+        images: ['https://i.postimg.cc/bYMWdDK9/3.jpg']
       }
     ],
     supervisionWorks: [

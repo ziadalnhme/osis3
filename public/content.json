@@ -1,0 +1,197 @@
+{
+  "designWorks": [
+    {
+      "id": "villas",
+      "title": "فلل وقصور",
+      "icon": "🏠",
+      "images": [
+        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "id": "commercial",
+      "title": "مشاريع تجارية",
+      "icon": "🏢",
+      "images": [
+        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "id": "residential",
+      "title": "مجمعات سكنية",
+      "icon": "🏗️",
+      "images": [
+        "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "supervisionWorks": [
+    {
+      "id": "towers",
+      "title": "أبراج إدارية",
+      "icon": "🏗️",
+      "images": [
+        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "id": "buildings",
+      "title": "عمائر سكنية",
+      "icon": "🏠",
+      "images": [
+        "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    },
+    {
+      "id": "mosques",
+      "title": "مساجد",
+      "icon": "🕌",
+      "images": [
+        "https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ]
+    }
+  ],
+  "featuredProjects": [
+    {
+      "id": "1",
+      "title": "مجمع الأمير السكني",
+      "category": "مشاريع سكنية",
+      "image": "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مجمع سكني فاخر يضم 120 وحدة سكنية"
+    },
+    {
+      "id": "2",
+      "title": "مركز النور التجاري",
+      "category": "مشاريع تجارية",
+      "image": "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مركز تجاري حديث بتصميم مبتكر"
+    },
+    {
+      "id": "3",
+      "title": "مدرسة المستقبل",
+      "category": "مشاريع تعليمية",
+      "image": "https://images.pexels.com/photos/159490/yale-university-landscape-universities-schools-159490.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مدرسة نموذجية مجهزة بأحدث التقنيات"
+    },
+    {
+      "id": "4",
+      "title": "مستشفى الشفاء",
+      "category": "مشاريع صحية",
+      "image": "https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مستشفى متخصص مجهز بأحدث المعدات"
+    },
+    {
+      "id": "5",
+      "title": "مصنع الابتكار",
+      "category": "مشاريع صناعية",
+      "image": "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مصنع حديث للصناعات الغذائية"
+    },
+    {
+      "id": "6",
+      "title": "جسر الملك فهد",
+      "category": "مشاريع البنية التحتية",
+      "image": "https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "description": "مشروع بنية تحتية متطور"
+    }
+  ],
+  "clientLogos": [
+    {
+      "id": "1",
+      "name": "شركة أرامكو السعودية",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=أرامكو"
+    },
+    {
+      "id": "2",
+      "name": "شركة سابك",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=سابك"
+    },
+    {
+      "id": "3",
+      "name": "شركة الراجحي",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=الراجحي"
+    },
+    {
+      "id": "4",
+      "name": "شركة الاتصالات السعودية",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=STC"
+    },
+    {
+      "id": "5",
+      "name": "شركة المراعي",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=المراعي"
+    },
+    {
+      "id": "6",
+      "name": "شركة الكهرباء السعودية",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=الكهرباء"
+    },
+    {
+      "id": "7",
+      "name": "شركة معادن",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=معادن"
+    },
+    {
+      "id": "8",
+      "name": "شركة الخطوط السعودية",
+      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=الخطوط"
+    }
+  ],
+  "teamMembers": [
+    {
+      "id": "1",
+      "name": "م. أحمد السعيد",
+      "position": "المدير العام",
+      "experience": "20 سنة خبرة",
+      "specialization": "الهندسة المعمارية"
+    },
+    {
+      "id": "2",
+      "name": "م. فاطمة الزهراني",
+      "position": "مدير التصميم",
+      "experience": "15 سنة خبرة",
+      "specialization": "التصميم الإنشائي"
+    },
+    {
+      "id": "3",
+      "name": "م. محمد العتيبي",
+      "position": "مدير المشاريع",
+      "experience": "18 سنة خبرة",
+      "specialization": "إدارة المشاريع"
+    },
+    {
+      "id": "4",
+      "name": "م. سارة القحطاني",
+      "position": "مهندسة كهروميكانيك",
+      "experience": "12 سنة خبرة",
+      "specialization": "الأنظمة الكهروميكانيكية"
+    }
+  ],
+  "heroSettings": {
+    "backgroundImage": "",
+    "overlayOpacity": 60,
+    "gradientColors": {
+      "from": "from-blue-900",
+      "via": "via-blue-800",
+      "to": "to-blue-900"
+    }
+  }
+}

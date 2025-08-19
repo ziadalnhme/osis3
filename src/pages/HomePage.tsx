@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle, Users, Award, Clock, Building, MessageCircle, Eye, Target, Download, FileText, Play, Pause, Calendar, Briefcase, Home, ShoppingBag, Zap, Hammer } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { loadPublicContent, ContentData } from '../utils/contentManager';
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
@@ -26,6 +27,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       to: 'to-blue-900'
     }
   });
+  const [contentData, setContentData] = React.useState<ContentData | null>(null);
 
   // Projects Gallery - moved before usage
   const projectsGallery = [
@@ -166,119 +168,72 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loadedClientLogos, setLoadedClientLogos] = React.useState(clientLogos);
 
   React.useEffect(() => {
-    // دالة تحميل البيانات
-    const loadData = () => {
-      console.log('تحميل البيانات في الصفحة الرئيسية...');
-      const savedDesignWorks = localStorage.getItem('content_designWorks');
-      const savedSupervisionWorks = localStorage.getItem('content_supervisionWorks');
-      const savedFeaturedProjects = localStorage.getItem('content_featuredProjects');
-      const savedClientLogos = localStorage.getItem('content_clientLogos');
-
-      if (savedDesignWorks) {
-        try {
-          const parsedDesignWorks = JSON.parse(savedDesignWorks);
-          console.log('تم تحميل أعمال التصميم:', parsedDesignWorks);
-          setLoadedDesignCategories(parsedDesignWorks.map((work: any) => ({
+    // دالة تحميل البيانات العامة
+    const loadData = async () => {
+      console.log('تحميل البيانات العامة...');
+      try {
+        const data = await loadPublicContent();
+        setContentData(data);
+        
+        // تحديث البيانات المحلية
+        if (data.designWorks) {
+          setLoadedDesignCategories(data.designWorks.map((work: any) => ({
             ...work,
             icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
           })));
-        } catch (error) {
-          console.error('خطأ في تحميل أعمال التصميم:', error);
         }
-      }
-
-      if (savedSupervisionWorks) {
-        try {
-          const parsedSupervisionWorks = JSON.parse(savedSupervisionWorks);
-          console.log('تم تحميل أعمال الإشراف:', parsedSupervisionWorks);
-          setLoadedSupervisionCategories(parsedSupervisionWorks.map((work: any) => ({
+        
+        if (data.supervisionWorks) {
+          setLoadedSupervisionCategories(data.supervisionWorks.map((work: any) => ({
             ...work,
             icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
           })));
-        } catch (error) {
-          console.error('خطأ في تحميل أعمال الإشراف:', error);
         }
-      }
-
-      if (savedFeaturedProjects) {
-        try {
-          const parsedFeaturedProjects = JSON.parse(savedFeaturedProjects);
-          console.log('تم تحميل المشاريع المميزة:', parsedFeaturedProjects);
-          setLoadedProjectsGallery(parsedFeaturedProjects);
-        } catch (error) {
-          console.error('خطأ في تحميل المشاريع المميزة:', error);
+        
+        if (data.featuredProjects) {
+          setLoadedProjectsGallery(data.featuredProjects);
         }
-      }
-
-      if (savedClientLogos) {
-        try {
-          const parsedClientLogos = JSON.parse(savedClientLogos);
-          console.log('تم تحميل شعارات العملاء:', parsedClientLogos);
-          setLoadedClientLogos(parsedClientLogos);
-        } catch (error) {
-          console.error('خطأ في تحميل شعارات العملاء:', error);
+        
+        if (data.clientLogos) {
+          setLoadedClientLogos(data.clientLogos);
         }
+        
+        if (data.heroSettings) {
+          setHeroSettings(data.heroSettings);
+        }
+        
+        console.log('تم تحميل البيانات العامة بنجاح');
+      } catch (error) {
+        console.error('خطأ في تحميل البيانات العامة:', error);
       }
     };
     
     // تحميل البيانات عند بدء التشغيل
     loadData();
     
-    // مراقبة تغييرات localStorage
-    const handleStorageChange = (e: StorageEvent) => {
-      console.log('تغيير في localStorage:', e.key);
-      if (e.key && (e.key.startsWith('content_') || e.key === 'adminMessages')) {
-        loadData();
-      }
-    };
-    
-    // مراقبة الأحداث المخصصة
-    const handleContentUpdate = (e: CustomEvent) => {
-      console.log('حدث تحديث المحتوى:', e.detail);
+    // مراقبة تحديثات المحتوى من المدير
+    const handleAdminContentUpdate = (e: CustomEvent) => {
+      console.log('تحديث محتوى من المدير:', e.detail);
       loadData();
     };
 
-    // مراقبة تحديثات المحتوى المباشرة
-    const handleDirectUpdate = () => {
-      console.log('تحديث مباشر للمحتوى');
-      setTimeout(loadData, 100); // تأخير صغير للتأكد من حفظ البيانات
-    };
-
-    // مراقبة تغييرات localStorage
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('contentUpdated', handleContentUpdate);
-    window.addEventListener('dataUpdated', handleDirectUpdate);
-    
-    // فحص دوري للتحديثات (كحل احتياطي)
-    const interval = setInterval(loadData, 5000);
-    
-    // تحميل إعدادات الخلفية
-    const loadHeroSettings = () => {
-      const savedHeroSettings = localStorage.getItem('content_heroSettings');
-      if (savedHeroSettings) {
-        try {
-          const parsedSettings = JSON.parse(savedHeroSettings);
-          setHeroSettings(parsedSettings);
-        } catch (error) {
-          console.error('خطأ في تحميل إعدادات الخلفية:', error);
-        }
+    // مراقبة تحديثات المحتوى العامة
+    const handleGlobalContentUpdate = (e: CustomEvent) => {
+      console.log('تحديث محتوى عام:', e.detail);
+      if (e.detail) {
+        setContentData(e.detail);
       }
     };
+
+    window.addEventListener('adminContentUpdated', handleAdminContentUpdate as EventListener);
+    window.addEventListener('globalContentUpdated', handleGlobalContentUpdate as EventListener);
     
-    loadHeroSettings();
-    
-    // مراقبة تحديثات إعدادات الخلفية
-    const handleHeroSettingsUpdate = (e: CustomEvent) => {
-      setHeroSettings(e.detail);
-    };
-    
-    window.addEventListener('heroSettingsUpdated', handleHeroSettingsUpdate as EventListener);
+    // فحص دوري للتحديثات (كحل احتياطي)
+    const interval = setInterval(loadData, 10000); // كل 10 ثواني
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('contentUpdated', handleContentUpdate);
-      window.removeEventListener('dataUpdated', handleDirectUpdate);
-      window.removeEventListener('heroSettingsUpdated', handleHeroSettingsUpdate as EventListener);
+      window.removeEventListener('adminContentUpdated', handleAdminContentUpdate as EventListener);
+      window.removeEventListener('globalContentUpdated', handleGlobalContentUpdate as EventListener);
       clearInterval(interval);
     };
   }, []);

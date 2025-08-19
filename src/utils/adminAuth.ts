@@ -278,10 +278,10 @@ export const getDefaultData = () => {
     designWorks: [
       {
         id: 'villas',
-        title: 'فلل وقصور',
+        title: 'فلل ور',
         icon: '🏠',
         images: [
-          'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+          'https://i.postimg.cc/bYMWdDK9/3.jpg',
           'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800'
         ]
       },

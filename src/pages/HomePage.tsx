@@ -33,45 +33,45 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const projectsGallery = [
     {
       id: 1,
-      title: language === 'ar' ? 'مبنى سكني' : 'Al-Amir Residential Complex',
-      category: t('gallery.residential'),
+      title: language === 'ar' ? 'مبنى سكني' : 'residential building',
+      category: t('residential projects'),
       image: 'https://i.postimg.cc/0rg07wvB/2.jpg',
-      description: language === 'ar' ? 'مبنى سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
+      description: language === 'ar' ? 'مبنى سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential building with 120 residential units'
     },
     {
       id: 2,
-      title: language === 'ar' ? 'مبنى سكني' : 'Al-Noor Commercial Center',
-      category: t('gallery.commercial'),
+      title: language === 'ar' ? 'مبنى سكني' : 'residential building',
+      category: t('residential projects'),
       image: 'https://i.postimg.cc/d116FFn4/8.jpg',
-      description: language === 'ar' ? 'مبنى سكني حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
+      description: language === 'ar' ? 'مبنى سكني حديث بتصميم مبتكر' : 'Modern residential building with innovative design'
     },
     {
       id: 3,
-      title: language === 'ar' ? 'فل دوبلكس' : 'Future School',
-      category: t('gallery.educational'),
+      title: language === 'ar' ? 'فل دوبلكس' : 'Full duplex',
+      category: t('luxury villas'),
       image: 'https://i.postimg.cc/fyQv9dDg/2.jpg',
-      description: language === 'ar' ? 'فله دوبلكس بتصميم فاخر' : 'Model school equipped with latest technology'
+      description: language === 'ar' ? 'فله دوبلكس بتصميم فاخر' : 'Luxuriously designed duplex villa'
     },
     {
       id: 4,
-      title: language === 'ar' ? 'فله بتصميم كلاسيك' : 'Al-Shifa Hospital',
-      category: t('gallery.healthcare'),
+      title: language === 'ar' ? 'فله بتصميم كلاسيك' : 'Classic design villa',
+      category: t('luxury villas'),
       image: 'https://i.postimg.cc/85SFdmfW/Enscape-2024-07-04-19-59-09.jpg',
-      description: language === 'ar' ? 'فله بتصميم فاخر كلاسيكي' : 'Specialized hospital with latest equipment'
+      description: language === 'ar' ? 'فله بتصميم فاخر كلاسيكي' : 'Villa with a classic luxury design'
     },
     {
       id: 5,
-      title: language === 'ar' ? 'تجـــــــــارية' : 'Innovation Factory',
-      category: t('gallery.industrial'),
+      title: language === 'ar' ? 'تجـــــــــارية' : 'Commercial',
+      category: t('Business projects'),
       image: 'https://i.postimg.cc/VLrY6bdc/6.jpg',
-      description: language === 'ar' ? 'مجمع تجاري بتصميم حديث' : 'Modern food industry factory'
+      description: language === 'ar' ? 'مجمع تجاري بتصميم حديث' : 'Modern design shopping mall'
     },
     {
       id: 6,
-      title: language === 'ar' ? 'شركة اسرار الشامل' : 'King Fahd Bridge',
-      category: t('gallery.infrastructure'),
+      title: language === 'ar' ? 'شركة اسرار الشامل' : 'Asrar Al-Shamel Company',
+      category: t('Business projects'),
       image: 'https://i.postimg.cc/9M5xGKBp/1-0.jpg',
-      description: language === 'ar' ? 'شركة اسرار الشامل تصميم تجاري حديث' : 'Advanced infrastructure project'
+      description: language === 'ar' ? 'شركة اسرار الشامل تصميم تجاري حديث' : 'Asrar Al-Shamel Company, Modern Commercial Design'
     }
   ];
 

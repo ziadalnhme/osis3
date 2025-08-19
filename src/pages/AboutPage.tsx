@@ -11,31 +11,31 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const defaultTeamMembers = [
     {
       id: '1',
-      name: 'م. أحمدمحمد السعيد',
+      name: 'م. حمزه الحميري',
       position: 'المدير العام',
       experience: '20 سنة خبرة',
       specialization: 'الهندسة المعمارية'
     },
     {
       id: '2',
-      name: 'م. فاطمة علي الزهراني',
+      name: 'م. جمال الزوم',
       position: 'مدير التصميم',
-      experience: '15 سنة خبرة',
+      experience: '7 سنة خبرة',
       specialization: 'التصميم الإنشائي'
     },
     {
       id: '3',
-      name: 'م. محمد العتيبي',
-      position: 'مدير المشاريع',
-      experience: '18 سنة خبرة',
+      name: 'م. عبدالفتاح',
+      position: 'نزل ميداني',
+      experience: '4 سنة خبرة',
       specialization: 'إدارة المشاريع'
     },
     {
       id: '4',
-      name: 'م. سارة القحطاني',
-      position: 'مهندسة كهروميكانيك',
-      experience: '12 سنة خبرة',
-      specialization: 'الأنظمة الكهروميكانيكية'
+      name: 'م. رشاد',
+      position: 'مهندس معماري',
+      experience: '4 سنة خبرة',
+      specialization: 'التصميم الإنشائي'
     }
   ];
 

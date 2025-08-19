@@ -20,7 +20,6 @@ import {
 import { 
   logout, 
   getCurrentUser, 
-  saveContentData, 
   getContentData,
   getDefaultData 
 } from '../utils/adminAuth';
@@ -79,7 +78,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   };
 
   const saveAndNotify = (key: string, data: any) => {
-    saveContentData(key, data);
+    localStorage.setItem(`content_${key}`, JSON.stringify(data));
     
     // إرسال حدث مخصص لإشعار الصفحات الأخرى بالتحديث
     window.dispatchEvent(new CustomEvent('contentUpdated', { 

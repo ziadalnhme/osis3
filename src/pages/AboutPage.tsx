@@ -1,6 +1,6 @@
 import React from 'react';
 import { Target, Eye, Award, Users, Calendar, CheckCircle, Building } from 'lucide-react';
-import { getContentData } from '../utils/adminAuth';
+import { loadPublicContent } from '../utils/contentManager';
 
 interface AboutPageProps {
   onNavigate: (page: string) => void;
@@ -44,35 +44,32 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
   // تحميل بيانات فريق العمل من localStorage
   React.useEffect(() => {
-    const loadTeamData = () => {
-      const savedTeamMembers = getContentData('teamMembers');
-      if (savedTeamMembers && Array.isArray(savedTeamMembers)) {
-        setTeamMembers(savedTeamMembers);
+    const loadTeamData = async () => {
+      try {
+        const data = await loadPublicContent();
+        if (data.teamMembers && Array.isArray(data.teamMembers)) {
+          setTeamMembers(data.teamMembers);
+        }
+      } catch (error) {
+        console.error('خطأ في تحميل بيانات الفريق:', error);
       }
     };
 
     loadTeamData();
 
-    // مراقبة تغييرات localStorage
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'content_teamMembers') {
-        loadTeamData();
-      }
-    };
-
-    // مراقبة الأحداث المخصصة
+    // مراقبة تحديثات المحتوى
     const handleContentUpdate = (e: CustomEvent) => {
-      if (e.detail.key === 'teamMembers') {
+      if (e.detail.section === 'teamMembers') {
         loadTeamData();
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('contentUpdated', handleContentUpdate as EventListener);
+    window.addEventListener('adminContentUpdated', handleContentUpdate as EventListener);
+    window.addEventListener('globalContentUpdated', handleContentUpdate as EventListener);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('contentUpdated', handleContentUpdate as EventListener);
+      window.removeEventListener('adminContentUpdated', handleContentUpdate as EventListener);
+      window.removeEventListener('globalContentUpdated', handleContentUpdate as EventListener);
     };
   }, []);
 

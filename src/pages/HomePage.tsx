@@ -33,45 +33,45 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const projectsGallery = [
     {
       id: 1,
-      title: language === 'ar' ? 'مجمع الأميرة السكني' : 'Al-Amir Residential Complex',
+      title: language === 'ar' ? 'مبنى سكني' : 'Al-Amir Residential Complex',
       category: t('gallery.residential'),
-      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
-      description: language === 'ar' ? 'مجمع سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
+      image: 'https://i.postimg.cc/0rg07wvB/2.jpg',
+      description: language === 'ar' ? 'مبنى سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
     },
     {
       id: 2,
-      title: language === 'ar' ? 'مركز النورة التجاري' : 'Al-Noor Commercial Center',
+      title: language === 'ar' ? 'مبنى سكني' : 'Al-Noor Commercial Center',
       category: t('gallery.commercial'),
-      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
-      description: language === 'ar' ? 'مركز تجاري حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
+      image: 'https://i.postimg.cc/d116FFn4/8.jpg',
+      description: language === 'ar' ? 'مبنى سكني حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
     },
     {
       id: 3,
-      title: language === 'ar' ? 'مدرسة المستقبل' : 'Future School',
+      title: language === 'ar' ? 'فل دوبلكس' : 'Future School',
       category: t('gallery.educational'),
-      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
-      description: language === 'ar' ? 'مدرسة نموذجية مجهزة بأحدث التقنيات' : 'Model school equipped with latest technology'
+      image: 'https://i.postimg.cc/fyQv9dDg/2.jpg',
+      description: language === 'ar' ? 'فله دوبلكس بتصميم فاخر' : 'Model school equipped with latest technology'
     },
     {
       id: 4,
-      title: language === 'ar' ? 'مستشفى الشفاء' : 'Al-Shifa Hospital',
+      title: language === 'ar' ? 'فله بتصميم كلاسيك' : 'Al-Shifa Hospital',
       category: t('gallery.healthcare'),
-      image: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مستشفى متخصص مجهز بأحدث المعدات' : 'Specialized hospital with latest equipment'
+      image: 'https://i.postimg.cc/85SFdmfW/Enscape-2024-07-04-19-59-09.jpg',
+      description: language === 'ar' ? 'فله بتصميم فاخر كلاسيكي' : 'Specialized hospital with latest equipment'
     },
     {
       id: 5,
-      title: language === 'ar' ? 'مصنع الابتكار' : 'Innovation Factory',
+      title: language === 'ar' ? 'تجـــــــــارية' : 'Innovation Factory',
       category: t('gallery.industrial'),
-      image: 'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مصنع حديث للصناعات الغذائية' : 'Modern food industry factory'
+      image: 'https://i.postimg.cc/VLrY6bdc/6.jpg',
+      description: language === 'ar' ? 'مجمع تجاري بتصميم حديث' : 'Modern food industry factory'
     },
     {
       id: 6,
-      title: language === 'ar' ? 'جسر الملك فهد' : 'King Fahd Bridge',
+      title: language === 'ar' ? 'شركة اسرار الشامل' : 'King Fahd Bridge',
       category: t('gallery.infrastructure'),
-      image: 'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
-      description: language === 'ar' ? 'مشروع بنية تحتية متطور' : 'Advanced infrastructure project'
+      image: 'https://i.postimg.cc/9M5xGKBp/1-0.jpg',
+      description: language === 'ar' ? 'شركة اسرار الشامل تصميم تجاري حديث' : 'Advanced infrastructure project'
     }
   ];
 
@@ -79,13 +79,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const designCategories = [
     {
       id: 'villas',
-      title: 'مباني سكنية',
+      title: 'فلل سكنية',
       icon: Home,
       images: [
-        'https://i.postimg.cc/bYMWdDK9/3.jpg',
-        'https://i.postimg.cc/RZxYLrC3/10.jpg',
-        'https://i.postimg.cc/Y04PbMmF/18.jpg',
-        'https://i.postimg.cc/X7Ch5NWS/36.jpg'
+        'https://i.postimg.cc/DwzyTYLB/11.jpg',
+        'https://i.postimg.cc/g0Zpc9Jq/Enscape-2024-02-18-10-53-58.jpg',
+        'https://i.postimg.cc/8kHSzm13/33.jpg',
+        'https://i.postimg.cc/s2pL03x8/16.jpg'
       ]
     },
     {
@@ -105,9 +105,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       icon: Building,
       images: [
         'https://i.postimg.cc/bYMWdDK9/3.jpg',
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/RZxYLrC3/10.jpg',
+        'https://i.postimg.cc/Y04PbMmF/18.jpg',
+        'https://i.postimg.cc/X7Ch5NWS/36.jpg'
       ]
     }
   ];
@@ -151,14 +151,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   // Client logos
   const clientLogos = [
-    { name: 'شركة أرامكو السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=أرامكو' },
-    { name: 'شركة سابك', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=سابك' },
-    { name: 'شركة الراجحي', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الراجحي' },
-    { name: 'شركة الاتصالات السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=STC' },
-    { name: 'شركة المراعي', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=المراعي' },
-    { name: 'شركة الكهرباء السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الكهرباء' },
-    { name: 'شركة معادن', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=معادن' },
-    { name: 'شركة الخطوط السعودية', logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=الخطوط' }
+    { name: 'شركة أرامكو السعودية', logo: 'https://m.eyeofriyadh.com/news_images/2022/10/1b83cab8ab6a1.jpg' },
+    { name: 'شركة سابك', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Logo_of_Sabic.svg/1200px-Logo_of_Sabic.svg.png' },
+    { name: 'شركة الراجحي', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm6UEYNPH2WBsqWWVXZ-3rpEYZLud_mpGdyg&s' },
+    { name: 'شركة الاتصالات السعودية', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e3/STC-01.svg' },
+    { name: 'شركة المراعي', logo: 'https://upload.wikimedia.org/wikipedia/ar/thumb/d/d7/Almarai_Corporate_Logo.svg/1200px-Almarai_Corporate_Logo.svg.png' },
+    { name: 'شركة الكهرباء السعودية', logo: 'https://salogos.org/wp-content/uploads/2021/11/salogos.org-%D8%B4%D8%B9%D8%A7%D8%B1-%D8%A7%D9%84%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A1.svg' },
+    { name: 'شركة معادن', logo: 'https://www.pif.gov.sa/-/media/project/pif-corporate/pif-corporate-site/our-investments/portfolio/pc-logos/maaden-new-logo.png' },
+    { name: 'شركة الخطوط السعودية', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/dc/Saudia_logo_2023.png' }
   ];
 
   // تحميل البيانات من localStorage أو استخدام البيانات الافتراضية

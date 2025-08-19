@@ -102,7 +102,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       id: Date.now().toString(),
       title: 'عمل جديد',
       icon: '🏠',
-      images: ['https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800']
+      images: ['https://i.postimg.cc/bYMWdDK9/3.jpg']
     };
     const updatedWorks = [...designWorks, newWork];
     setDesignWorks(updatedWorks);
@@ -131,7 +131,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       id: Date.now().toString(),
       title: 'عمل إشراف جديد',
       icon: '🏗️',
-      images: ['https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800']
+      images: ['https://i.postimg.cc/bYMWdDK9/3.jpg']
     };
     const updatedWorks = [...supervisionWorks, newWork];
     setSupervisionWorks(updatedWorks);
@@ -159,8 +159,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const newProject = {
       id: Date.now().toString(),
       title: 'مشروع مميز جديد',
-      category: 'مشاريع سكنية',
-      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+      category: 'مشاريع 2 سكنية',
+      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
       description: 'وصف المشروع'
     };
     const updatedProjects = [...featuredProjects, newProject];
@@ -189,7 +189,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
     const newClient = {
       id: Date.now().toString(),
       name: 'عميل جديد',
-      logo: 'https://via.placeholder.com/150x80/1e40af/ffffff?text=شعار'
+      logo: 'https://i.postimg.cc/bYMWdDK9/3.jpg'
     };
     const updatedClients = [...clientLogos, newClient];
     setClientLogos(updatedClients);

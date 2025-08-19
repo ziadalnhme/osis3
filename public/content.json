@@ -2,13 +2,10 @@
   "designWorks": [
     {
       "id": "villas",
-      "title": "فلل وقصور",
+      "title": "مباني سكنية",
       "icon": "🏠",
       "images": [
-        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "https://i.postimg.cc/Y04PbMmF/18.jpg"
       ]
     },
     {
@@ -16,7 +13,7 @@
       "title": "مشاريع تجارية",
       "icon": "🏢",
       "images": [
-        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://i.postimg.cc/bYMWdDK9/3.jpg",
         "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800"
@@ -27,7 +24,7 @@
       "title": "مجمعات سكنية",
       "icon": "🏗️",
       "images": [
-        "https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://i.postimg.cc/bYMWdDK9/3.jpg",
         "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800"
@@ -40,7 +37,7 @@
       "title": "أبراج إدارية",
       "icon": "🏗️",
       "images": [
-        "https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://i.postimg.cc/bYMWdDK9/3.jpg",
         "https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800"
@@ -152,7 +149,7 @@
     {
       "id": "8",
       "name": "شركة الخطوط السعودية",
-      "logo": "https://via.placeholder.com/150x80/1e40af/ffffff?text=الخطوط"
+      "logo": "https://i.postimg.cc/bYMWdDK9/3.jpg"
     }
   ],
   "teamMembers": [

@@ -286,10 +286,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   const engineeringImages = [
     'https://i.postimg.cc/bYMWdDK9/3.jpg',
-    'https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/3862365/pexels-photo-3862365.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/3861458/pexels-photo-3861458.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    'https://images.pexels.com/photos/416405/pexels-photo-416405.jpeg?auto=compress&cs=tinysrgb&w=1920'
+    'https://i.postimg.cc/J02DVVtV/24.jpg',
+    'https://i.postimg.cc/5yT0KBkf/9.jpg',
+    'https://i.postimg.cc/VLrY6bdc/6.jpg',
+    'https://i.postimg.cc/YqFqqmsm/34.jpg'
   ];
 
   const services = [

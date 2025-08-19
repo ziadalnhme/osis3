@@ -168,73 +168,119 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loadedClientLogos, setLoadedClientLogos] = React.useState(clientLogos);
 
   React.useEffect(() => {
-    // دالة تحميل البيانات العامة
-    const loadData = async () => {
-      console.log('تحميل البيانات العامة...');
-      try {
-        const data = await loadPublicContent();
-        setContentData(data);
-        
-        // تحديث البيانات المحلية
-        if (data.designWorks) {
-          setLoadedDesignCategories(data.designWorks.map((work: any) => ({
+    // دالة تحميل البيانات من localStorage
+    const loadDataFromStorage = () => {
+      console.log('تحميل البيانات من localStorage...');
+      
+      // تحميل أعمال التصميم
+      const designWorksData = localStorage.getItem('content_designWorks');
+      if (designWorksData) {
+        try {
+          const parsedData = JSON.parse(designWorksData);
+          setLoadedDesignCategories(parsedData.map((work: any) => ({
             ...work,
             icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
           })));
+          console.log('تم تحميل أعمال التصميم من localStorage');
+        } catch (error) {
+          console.error('خطأ في تحليل أعمال التصميم:', error);
         }
-        
-        if (data.supervisionWorks) {
-          setLoadedSupervisionCategories(data.supervisionWorks.map((work: any) => ({
+      }
+      
+      // تحميل أعمال الإشراف
+      const supervisionWorksData = localStorage.getItem('content_supervisionWorks');
+      if (supervisionWorksData) {
+        try {
+          const parsedData = JSON.parse(supervisionWorksData);
+          setLoadedSupervisionCategories(parsedData.map((work: any) => ({
             ...work,
             icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
           })));
+          console.log('تم تحميل أعمال الإشراف من localStorage');
+        } catch (error) {
+          console.error('خطأ في تحليل أعمال الإشراف:', error);
         }
-        
-        if (data.featuredProjects) {
-          setLoadedProjectsGallery(data.featuredProjects);
+      }
+      
+      // تحميل المشاريع المميزة
+      const featuredProjectsData = localStorage.getItem('content_featuredProjects');
+      if (featuredProjectsData) {
+        try {
+          const parsedData = JSON.parse(featuredProjectsData);
+          setLoadedProjectsGallery(parsedData);
+          console.log('تم تحميل المشاريع المميزة من localStorage');
+        } catch (error) {
+          console.error('خطأ في تحليل المشاريع المميزة:', error);
         }
-        
-        if (data.clientLogos) {
-          setLoadedClientLogos(data.clientLogos);
+      }
+      
+      // تحميل شعارات العملاء
+      const clientLogosData = localStorage.getItem('content_clientLogos');
+      if (clientLogosData) {
+        try {
+          const parsedData = JSON.parse(clientLogosData);
+          setLoadedClientLogos(parsedData);
+          console.log('تم تحميل شعارات العملاء من localStorage');
+        } catch (error) {
+          console.error('خطأ في تحليل شعارات العملاء:', error);
         }
-        
-        if (data.heroSettings) {
-          setHeroSettings(data.heroSettings);
+      }
+      
+      // تحميل إعدادات الخلفية
+      const heroSettingsData = localStorage.getItem('content_heroSettings');
+      if (heroSettingsData) {
+        try {
+          const parsedData = JSON.parse(heroSettingsData);
+          setHeroSettings(parsedData);
+          console.log('تم تحميل إعدادات الخلفية من localStorage');
+        } catch (error) {
+          console.error('خطأ في تحليل إعدادات الخلفية:', error);
         }
-        
-        console.log('تم تحميل البيانات العامة بنجاح');
-      } catch (error) {
-        console.error('خطأ في تحميل البيانات العامة:', error);
       }
     };
     
     // تحميل البيانات عند بدء التشغيل
-    loadData();
+    loadDataFromStorage();
     
     // مراقبة تحديثات المحتوى من المدير
+    const handleContentUpdate = (e: CustomEvent) => {
+      console.log('تحديث محتوى:', e.detail);
+      const { section, data } = e.detail;
+      
+      // تحديث البيانات حسب النوع
+      if (section === 'designWorks') {
+        setLoadedDesignCategories(data.map((work: any) => ({
+          ...work,
+          icon: work.icon === '🏠' ? Home : work.icon === '🏢' ? ShoppingBag : Building
+        })));
+      } else if (section === 'supervisionWorks') {
+        setLoadedSupervisionCategories(data.map((work: any) => ({
+          ...work,
+          icon: work.icon === '🏗️' ? Building : work.icon === '🏠' ? Home : Award
+        })));
+      } else if (section === 'featuredProjects') {
+        setLoadedProjectsGallery(data);
+      } else if (section === 'clientLogos') {
+        setLoadedClientLogos(data);
+      } else if (section === 'heroSettings') {
+        setHeroSettings(data);
+      }
+      
+      console.log(`تم تحديث ${section} في الصفحة الرئيسية`);
+    };
+
     const handleAdminContentUpdate = (e: CustomEvent) => {
       console.log('تحديث محتوى من المدير:', e.detail);
-      loadData();
+      handleContentUpdate(e);
     };
 
-    // مراقبة تحديثات المحتوى العامة
-    const handleGlobalContentUpdate = (e: CustomEvent) => {
-      console.log('تحديث محتوى عام:', e.detail);
-      if (e.detail) {
-        setContentData(e.detail);
-      }
-    };
-
+    // إضافة مستمعي الأحداث
+    window.addEventListener('contentUpdated', handleContentUpdate as EventListener);
     window.addEventListener('adminContentUpdated', handleAdminContentUpdate as EventListener);
-    window.addEventListener('globalContentUpdated', handleGlobalContentUpdate as EventListener);
-    
-    // فحص دوري للتحديثات (كحل احتياطي)
-    const interval = setInterval(loadData, 10000); // كل 10 ثواني
     
     return () => {
+      window.removeEventListener('contentUpdated', handleContentUpdate as EventListener);
       window.removeEventListener('adminContentUpdated', handleAdminContentUpdate as EventListener);
-      window.removeEventListener('globalContentUpdated', handleGlobalContentUpdate as EventListener);
-      clearInterval(interval);
     };
   }, []);
 

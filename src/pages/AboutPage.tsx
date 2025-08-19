@@ -44,14 +44,19 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
   // تحميل بيانات فريق العمل من localStorage
   React.useEffect(() => {
-    const loadTeamData = async () => {
-      try {
-        const data = await loadPublicContent();
-        if (data.teamMembers && Array.isArray(data.teamMembers)) {
-          setTeamMembers(data.teamMembers);
+    // تحميل بيانات فريق العمل من localStorage
+    const loadTeamData = () => {
+      const teamData = localStorage.getItem('content_teamMembers');
+      if (teamData) {
+        try {
+          const parsedData = JSON.parse(teamData);
+          if (Array.isArray(parsedData)) {
+            setTeamMembers(parsedData);
+            console.log('تم تحميل بيانات الفريق من localStorage');
+          }
+        } catch (error) {
+          console.error('خطأ في تحليل بيانات الفريق:', error);
         }
-      } catch (error) {
-        console.error('خطأ في تحميل بيانات الفريق:', error);
       }
     };
 
@@ -59,17 +64,23 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
     // مراقبة تحديثات المحتوى
     const handleContentUpdate = (e: CustomEvent) => {
-      if (e.detail.section === 'teamMembers') {
-        loadTeamData();
+      const { section, data } = e.detail;
+      if (section === 'teamMembers') {
+        setTeamMembers(data);
+        console.log('تم تحديث بيانات الفريق في صفحة حول الشركة');
       }
     };
 
+    const handleAdminContentUpdate = (e: CustomEvent) => {
+      handleContentUpdate(e);
+    };
+
+    window.addEventListener('contentUpdated', handleContentUpdate as EventListener);
     window.addEventListener('adminContentUpdated', handleContentUpdate as EventListener);
-    window.addEventListener('globalContentUpdated', handleContentUpdate as EventListener);
 
     return () => {
+      window.removeEventListener('contentUpdated', handleContentUpdate as EventListener);
       window.removeEventListener('adminContentUpdated', handleContentUpdate as EventListener);
-      window.removeEventListener('globalContentUpdated', handleContentUpdate as EventListener);
     };
   }, []);
 

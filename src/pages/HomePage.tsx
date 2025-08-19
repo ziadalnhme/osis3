@@ -33,23 +33,23 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const projectsGallery = [
     {
       id: 1,
-      title: language === 'ar' ? 'مجمع الأمير السكني' : 'Al-Amir Residential Complex',
+      title: language === 'ar' ? 'مجمع الأميرة السكني' : 'Al-Amir Residential Complex',
       category: t('gallery.residential'),
-      image: 'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
       description: language === 'ar' ? 'مجمع سكني فاخر يضم 120 وحدة سكنية' : 'Luxury residential complex with 120 units'
     },
     {
       id: 2,
-      title: language === 'ar' ? 'مركز النور التجاري' : 'Al-Noor Commercial Center',
+      title: language === 'ar' ? 'مركز النورة التجاري' : 'Al-Noor Commercial Center',
       category: t('gallery.commercial'),
-      image: 'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
       description: language === 'ar' ? 'مركز تجاري حديث بتصميم مبتكر' : 'Modern commercial center with innovative design'
     },
     {
       id: 3,
       title: language === 'ar' ? 'مدرسة المستقبل' : 'Future School',
       category: t('gallery.educational'),
-      image: 'https://images.pexels.com/photos/159490/yale-university-landscape-universities-schools-159490.jpeg?auto=compress&cs=tinysrgb&w=800',
+      image: 'https://i.postimg.cc/bYMWdDK9/3.jpg',
       description: language === 'ar' ? 'مدرسة نموذجية مجهزة بأحدث التقنيات' : 'Model school equipped with latest technology'
     },
     {
@@ -79,21 +79,21 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const designCategories = [
     {
       id: 'villas',
-      title: 'فلل وقصور',
+      title: 'فلل 44',
       icon: Home,
       images: [
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://i.postimg.cc/bYMWdDK9/3.jpg',
+        'https://i.postimg.cc/bYMWdDK9/3.jpg',
         'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800'
       ]
     },
     {
       id: 'commercial',
-      title: 'مشاريع تجارية',
+      title: 'مباني سكنية',
       icon: ShoppingBag,
       images: [
-        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://i.postimg.cc/bYMWdDK9/3.jpg',
         'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800'
@@ -104,7 +104,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
       title: 'مجمعات سكنية',
       icon: Building,
       images: [
-        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
+        'https://i.postimg.cc/bYMWdDK9/3.jpg',
         'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800',
         'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'

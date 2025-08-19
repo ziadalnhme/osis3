@@ -11,7 +11,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const defaultTeamMembers = [
     {
       id: '1',
-      name: 'م. أحمد السعيد',
+      name: 'م. أحمدمحمد السعيد',
       position: 'المدير العام',
       experience: '20 سنة خبرة',
       specialization: 'الهندسة المعمارية'

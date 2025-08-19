@@ -90,13 +90,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     },
     {
       id: 'commercial',
-      title: 'مباني سكنية',
+      title: 'تجــــــــــارية',
       icon: ShoppingBag,
       images: [
-        'https://i.postimg.cc/bYMWdDK9/3.jpg',
-        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/vT8sbckC/41.jpg',
+        'https://i.postimg.cc/rpWcJ65Z/5.jpg',
+        'https://i.postimg.cc/gjtfp4v6/22.jpg',
+        'https://i.postimg.cc/sxnRX3Rx/2.jpg'
       ]
     },
     {

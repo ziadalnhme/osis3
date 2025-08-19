@@ -15,6 +15,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       position: 'المدير العام',
       experience: '20 سنة خبرة',
       specialization: 'الهندسة المعمارية'
+      images: [
+        'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg'
     },
     {
       id: '2',
@@ -26,7 +28,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     {
       id: '3',
       name: 'م. عبدالفتاح',
-      position: 'نزل ميداني',
+      position: 'نزول ميداني',
       experience: '4 سنة خبرة',
       specialization: 'إدارة المشاريع'
     },
@@ -36,6 +38,8 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       position: 'مهندس معماري',
       experience: '4 سنة خبرة',
       specialization: 'التصميم الإنشائي'
+      images: [
+        'https://i.postimg.cc/Dwgh8Qdm/image.jpg'
     }
   ];
 

@@ -52,7 +52,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onNavigate }) => {
           <div className="bg-white p-4 rounded-full inline-block mb-4 shadow-lg">
             <Shield className="h-12 w-12 text-blue-600" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">لوحة التحكم</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">تسجيل الدخول</h1>
           <p className="text-blue-100">أسس الأعمار للاستشارات الهندسية</p>
         </div>
 

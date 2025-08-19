@@ -79,13 +79,13 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const designCategories = [
     {
       id: 'villas',
-      title: 'فلل 44',
+      title: 'مباني سكنية',
       icon: Home,
       images: [
         'https://i.postimg.cc/bYMWdDK9/3.jpg',
-        'https://i.postimg.cc/bYMWdDK9/3.jpg',
-        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/RZxYLrC3/10.jpg',
+        'https://i.postimg.cc/Y04PbMmF/18.jpg',
+        'https://i.postimg.cc/X7Ch5NWS/36.jpg'
       ]
     },
     {

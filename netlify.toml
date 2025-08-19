@@ -5,9 +5,33 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Enable Netlify Identity for CMS authentication
+[build.processing]
+  skip_processing = false
+
+# Netlify CMS configuration
+[[plugins]]
+  package = "netlify-plugin-submit-sitemap"
+
+  [plugins.inputs]
+    baseUrl = "https://osis-sa.netlify.app"
+    sitemapPath = "/sitemap.xml"
+    ignorePeriod = 0
+    providers = [
+      "google",
+      "bing",
+      "yandex"
+    ]
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+# Admin redirect
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
   status = 200
 
 [[headers]]
@@ -22,3 +46,13 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/images/uploads/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"

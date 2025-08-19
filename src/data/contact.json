@@ -1,0 +1,30 @@
+{
+  "title": "تواصل معنا",
+  "description": "نحن هنا لمساعدتك في تحويل أفكارك إلى مشاريع واقعية ومميزة",
+  "contactInfo": [
+    {
+      "type": "phone",
+      "title": "الهاتف",
+      "value": "+966 55 929 9897\nواتساب متاح",
+      "icon": "Phone"
+    },
+    {
+      "type": "email",
+      "title": "البريد الإلكتروني",
+      "value": "info@osos-imar.com\nprojects@osos-imar.com",
+      "icon": "Mail"
+    },
+    {
+      "type": "address",
+      "title": "العنوان",
+      "value": "حي المنار، شارع الملك فهد طريق المطار\nجوار مطعم البيك، الدمام 32273",
+      "icon": "MapPin"
+    },
+    {
+      "type": "hours",
+      "title": "ساعات العمل",
+      "value": "السبت - الخميس: 8:00 ص - 12:00 م\nو 4:00 م - 8:00 م",
+      "icon": "Clock"
+    }
+  ]
+}

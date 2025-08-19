@@ -1,0 +1,204 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+locale: 'ar'
+
+collections:
+  - name: "settings"
+    label: "إعدادات الموقع"
+    files:
+      - name: "general"
+        label: "الإعدادات العامة"
+        file: "src/data/settings.json"
+        fields:
+          - { label: "اسم الشركة", name: "companyName", widget: "string", default: "أسس الأعمار للاستشارات الهندسية" }
+          - { label: "وصف الشركة", name: "companyDescription", widget: "text" }
+          - { label: "رقم الهاتف", name: "phone", widget: "string", default: "+966 55 929 9897" }
+          - { label: "البريد الإلكتروني", name: "email", widget: "string", default: "info@osos-imar.com" }
+          - { label: "العنوان", name: "address", widget: "text" }
+          - { label: "ساعات العمل", name: "workingHours", widget: "string" }
+          - { label: "رابط الواتساب", name: "whatsappLink", widget: "string" }
+          - { label: "شعار الشركة", name: "logo", widget: "image" }
+
+      - name: "hero"
+        label: "القسم الرئيسي"
+        file: "src/data/hero.json"
+        fields:
+          - { label: "العنوان الرئيسي", name: "title", widget: "string" }
+          - { label: "النص الفرعي", name: "subtitle", widget: "text" }
+          - { label: "صورة الخلفية", name: "backgroundImage", widget: "image", required: false }
+          - { label: "شفافية الطبقة العلوية", name: "overlayOpacity", widget: "number", min: 0, max: 100, default: 60 }
+          - label: "ألوان التدرج"
+            name: "gradientColors"
+            widget: "object"
+            fields:
+              - { label: "اللون الأول", name: "from", widget: "select", options: ["from-blue-900", "from-gray-900", "from-green-900", "from-purple-900", "from-red-900"] }
+              - { label: "اللون الأوسط", name: "via", widget: "select", options: ["via-blue-800", "via-gray-800", "via-green-800", "via-purple-800", "via-red-800"] }
+              - { label: "اللون الأخير", name: "to", widget: "select", options: ["to-blue-900", "to-gray-900", "to-green-900", "to-purple-900", "to-red-900"] }
+
+  - name: "design_works"
+    label: "أعمال التصميم"
+    folder: "src/data/design-works"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "العنوان", name: "title", widget: "string" }
+      - { label: "الأيقونة", name: "icon", widget: "select", options: ["🏠", "🏢", "🏗️", "🕌", "🏥", "🏫"] }
+      - label: "الصور"
+        name: "images"
+        widget: "list"
+        field: { label: "صورة", name: "image", widget: "image" }
+      - { label: "الوصف", name: "description", widget: "text", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "supervision_works"
+    label: "أعمال الإشراف"
+    folder: "src/data/supervision-works"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "العنوان", name: "title", widget: "string" }
+      - { label: "الأيقونة", name: "icon", widget: "select", options: ["🏗️", "🏠", "🕌", "🏥", "🏫", "🏢"] }
+      - label: "الصور"
+        name: "images"
+        widget: "list"
+        field: { label: "صورة", name: "image", widget: "image" }
+      - { label: "الوصف", name: "description", widget: "text", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "featured_projects"
+    label: "المشاريع المميزة"
+    folder: "src/data/featured-projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "عنوان المشروع", name: "title", widget: "string" }
+      - { label: "فئة المشروع", name: "category", widget: "select", options: ["مشاريع سكنية", "مشاريع تجارية", "مشاريع تعليمية", "مشاريع صحية", "مشاريع صناعية", "مشاريع البنية التحتية"] }
+      - { label: "صورة المشروع", name: "image", widget: "image" }
+      - { label: "وصف المشروع", name: "description", widget: "text" }
+      - { label: "الموقع", name: "location", widget: "string", required: false }
+      - { label: "سنة التنفيذ", name: "year", widget: "string", required: false }
+      - { label: "المساحة", name: "area", widget: "string", required: false }
+      - { label: "العميل", name: "client", widget: "string", required: false }
+      - label: "الخدمات المقدمة"
+        name: "services"
+        widget: "list"
+        field: { label: "خدمة", name: "service", widget: "string" }
+      - { label: "تفاصيل إضافية", name: "details", widget: "text", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "team_members"
+    label: "فريق العمل"
+    folder: "src/data/team-members"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "الاسم", name: "name", widget: "string" }
+      - { label: "المنصب", name: "position", widget: "string" }
+      - { label: "سنوات الخبرة", name: "experience", widget: "string" }
+      - { label: "التخصص", name: "specialization", widget: "string" }
+      - { label: "الصورة الشخصية", name: "image", widget: "image", required: false }
+      - { label: "نبذة شخصية", name: "bio", widget: "text", required: false }
+      - { label: "البريد الإلكتروني", name: "email", widget: "string", required: false }
+      - { label: "رقم الهاتف", name: "phone", widget: "string", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "client_logos"
+    label: "شعارات العملاء"
+    folder: "src/data/client-logos"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "اسم العميل", name: "name", widget: "string" }
+      - { label: "الشعار", name: "logo", widget: "image" }
+      - { label: "رابط الموقع", name: "website", widget: "string", required: false }
+      - { label: "وصف العميل", name: "description", widget: "text", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "services"
+    label: "الخدمات"
+    folder: "src/data/services"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "اسم الخدمة", name: "title", widget: "string" }
+      - { label: "الأيقونة", name: "icon", widget: "select", options: ["Building", "Hammer", "Zap", "Settings", "Users", "FileText"] }
+      - { label: "وصف مختصر", name: "description", widget: "text" }
+      - { label: "وصف مفصل", name: "details", widget: "text" }
+      - label: "المميزات"
+        name: "features"
+        widget: "list"
+        field: { label: "ميزة", name: "feature", widget: "string" }
+      - { label: "صورة الخدمة", name: "image", widget: "image", required: false }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }
+
+  - name: "pages"
+    label: "الصفحات"
+    files:
+      - name: "about"
+        label: "صفحة حول الشركة"
+        file: "src/data/about.json"
+        fields:
+          - { label: "عنوان الصفحة", name: "title", widget: "string" }
+          - { label: "وصف الصفحة", name: "description", widget: "text" }
+          - { label: "قصة الشركة", name: "story", widget: "text" }
+          - { label: "الرؤية", name: "vision", widget: "text" }
+          - { label: "الرسالة", name: "mission", widget: "text" }
+          - { label: "الأهداف", name: "goals", widget: "text" }
+          - label: "القيم"
+            name: "values"
+            widget: "list"
+            fields:
+              - { label: "العنوان", name: "title", widget: "string" }
+              - { label: "الوصف", name: "description", widget: "text" }
+              - { label: "الأيقونة", name: "icon", widget: "string" }
+
+      - name: "contact"
+        label: "صفحة التواصل"
+        file: "src/data/contact.json"
+        fields:
+          - { label: "عنوان الصفحة", name: "title", widget: "string" }
+          - { label: "وصف الصفحة", name: "description", widget: "text" }
+          - label: "معلومات التواصل"
+            name: "contactInfo"
+            widget: "list"
+            fields:
+              - { label: "النوع", name: "type", widget: "select", options: ["phone", "email", "address", "hours"] }
+              - { label: "العنوان", name: "title", widget: "string" }
+              - { label: "القيمة", name: "value", widget: "text" }
+              - { label: "الأيقونة", name: "icon", widget: "string" }
+
+  - name: "blog"
+    label: "المدونة"
+    folder: "src/data/blog"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "عنوان المقال", name: "title", widget: "string" }
+      - { label: "تاريخ النشر", name: "date", widget: "datetime" }
+      - { label: "الكاتب", name: "author", widget: "string" }
+      - { label: "فئة المقال", name: "category", widget: "select", options: ["أخبار", "مشاريع", "نصائح", "تقنيات"] }
+      - { label: "صورة المقال", name: "image", widget: "image" }
+      - { label: "مقدمة المقال", name: "excerpt", widget: "text" }
+      - { label: "محتوى المقال", name: "body", widget: "markdown" }
+      - { label: "الكلمات المفتاحية", name: "tags", widget: "list", field: { label: "كلمة مفتاحية", name: "tag", widget: "string" } }
+      - { label: "منشور", name: "published", widget: "boolean", default: true }
+
+  - name: "testimonials"
+    label: "آراء العملاء"
+    folder: "src/data/testimonials"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "اسم العميل", name: "name", widget: "string" }
+      - { label: "المنصب", name: "position", widget: "string" }
+      - { label: "الشركة", name: "company", widget: "string" }
+      - { label: "نص الشهادة", name: "testimonial", widget: "text" }
+      - { label: "التقييم", name: "rating", widget: "number", min: 1, max: 5, default: 5 }
+      - { label: "صورة العميل", name: "image", widget: "image", required: false }
+      - { label: "تاريخ الشهادة", name: "date", widget: "datetime" }
+      - { label: "ترتيب العرض", name: "order", widget: "number", default: 1 }

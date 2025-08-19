@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم أسس الأعمار</title>
+  <link rel="icon" type="image/svg+xml" href="/شعار اسس الاعمار المتقدمة-0١.svg" />
+  
+  <!-- Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  
+  <!-- Custom CSS for RTL support -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      direction: rtl;
+      text-align: right;
+    }
+    
+    .nc-app-header {
+      direction: rtl;
+    }
+    
+    .nc-entryEditor-editor {
+      direction: rtl;
+      text-align: right;
+    }
+    
+    .nc-controlPane-widget {
+      direction: rtl;
+    }
+    
+    .nc-controlPane-widget input,
+    .nc-controlPane-widget textarea,
+    .nc-controlPane-widget select {
+      direction: rtl;
+      text-align: right;
+    }
+    
+    .nc-collectionPage-sidebar {
+      direction: rtl;
+    }
+    
+    .nc-entryListing-card {
+      direction: rtl;
+      text-align: right;
+    }
+    
+    /* Custom branding */
+    .nc-app-header-content::before {
+      content: "لوحة تحكم أسس الأعمار للاستشارات الهندسية";
+      font-weight: bold;
+      color: #1e40af;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- A little help text -->
+  <div id="nc-root">
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+      <h1 style="color: #1e40af;">🏗️ لوحة تحكم أسس الأعمار</h1>
+      <p>جاري تحميل لوحة التحكم...</p>
+      <div style="margin: 20px 0;">
+        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #1e40af; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    // Custom configuration for Arabic support
+    CMS.init({
+      config: {
+        locale: 'ar',
+        load_config_file: true
+      }
+    });
+
+    // Custom preview templates
+    CMS.registerPreviewTemplate('design_works', ({ entry, widgetFor, widgetsFor }) => {
+      const title = entry.getIn(['data', 'title']);
+      const icon = entry.getIn(['data', 'icon']);
+      const images = entry.getIn(['data', 'images']);
+      
+      return `
+        <div style="padding: 20px; direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+          <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <span style="font-size: 24px; margin-left: 10px;">${icon}</span>
+            <h2 style="color: #1e40af; margin: 0;">${title}</h2>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            ${images ? images.map(img => `<img src="${img}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;" />`).join('') : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    CMS.registerPreviewTemplate('featured_projects', ({ entry }) => {
+      const title = entry.getIn(['data', 'title']);
+      const category = entry.getIn(['data', 'category']);
+      const image = entry.getIn(['data', 'image']);
+      const description = entry.getIn(['data', 'description']);
+      
+      return `
+        <div style="padding: 20px; direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+          <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <img src="${image}" style="width: 100%; height: 200px; object-fit: cover;" />
+            <div style="padding: 20px;">
+              <span style="background: #1e40af; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px;">${category}</span>
+              <h3 style="color: #1f2937; margin: 15px 0 10px 0;">${title}</h3>
+              <p style="color: #6b7280; line-height: 1.6;">${description}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    CMS.registerPreviewTemplate('team_members', ({ entry }) => {
+      const name = entry.getIn(['data', 'name']);
+      const position = entry.getIn(['data', 'position']);
+      const experience = entry.getIn(['data', 'experience']);
+      const specialization = entry.getIn(['data', 'specialization']);
+      const image = entry.getIn(['data', 'image']);
+      
+      return `
+        <div style="padding: 20px; direction: rtl; text-align: right; font-family: Arial, sans-serif;">
+          <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+            <div style="background: linear-gradient(135deg, #1e40af, #1e3a8a); height: 120px; position: relative;">
+              ${image ? `<img src="${image}" style="width: 80px; height: 80px; border-radius: 50%; position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); border: 4px solid white;" />` : ''}
+            </div>
+            <div style="padding: 50px 20px 20px;">
+              <h3 style="color: #1f2937; margin: 0 0 10px 0;">${name}</h3>
+              <p style="color: #1e40af; font-weight: bold; margin: 0 0 5px 0;">${position}</p>
+              <p style="color: #6b7280; font-size: 14px; margin: 0 0 5px 0;">${experience}</p>
+              <p style="color: #6b7280; font-size: 14px; margin: 0;">${specialization}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // Custom widget for icon selection with preview
+    CMS.registerWidget('icon-select', {
+      controlComponent: ({ value, onChange, field }) => {
+        const icons = field.get('options').toJS();
+        return React.createElement('div', {
+          style: { direction: 'rtl' }
+        }, [
+          React.createElement('select', {
+            key: 'select',
+            value: value || '',
+            onChange: (e) => onChange(e.target.value),
+            style: { 
+              width: '100%', 
+              padding: '8px', 
+              direction: 'rtl',
+              fontSize: '16px'
+            }
+          }, [
+            React.createElement('option', { key: 'empty', value: '' }, 'اختر أيقونة'),
+            ...icons.map(icon => 
+              React.createElement('option', { 
+                key: icon, 
+                value: icon 
+              }, `${icon} ${icon}`)
+            )
+          ]),
+          value && React.createElement('div', {
+            key: 'preview',
+            style: { 
+              marginTop: '10px', 
+              fontSize: '24px', 
+              textAlign: 'center',
+              padding: '10px',
+              background: '#f3f4f6',
+              borderRadius: '8px'
+            }
+          }, value)
+        ]);
+      },
+      previewComponent: ({ value }) => {
+        return React.createElement('span', {
+          style: { fontSize: '24px' }
+        }, value);
+      }
+    });
+
+    console.log('Netlify CMS تم تحميل لوحة التحكم بنجاح! 🎉');
+  </script>
+</body>
+</html>

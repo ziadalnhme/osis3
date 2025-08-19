@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { NetlifyCMSProvider } from './components/NetlifyCMSProvider';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -35,13 +36,15 @@ function App() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-white font-arabic text-sm" style={{ fontFamily: 'Noor, Arial, sans-serif', fontWeight: 400 }}>
-        <Header currentPage={currentPage} onNavigate={setCurrentPage} />
-        <main>
-          {renderPage()}
-        </main>
-        <Footer onNavigate={setCurrentPage} />
-      </div>
+      <NetlifyCMSProvider>
+        <div className="min-h-screen bg-white font-arabic text-sm" style={{ fontFamily: 'Noor, Arial, sans-serif', fontWeight: 400 }}>
+          <Header currentPage={currentPage} onNavigate={setCurrentPage} />
+          <main>
+            {renderPage()}
+          </main>
+          <Footer onNavigate={setCurrentPage} />
+        </div>
+      </NetlifyCMSProvider>
     </LanguageProvider>
   );
 }

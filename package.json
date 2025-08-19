@@ -14,6 +14,10 @@
     "@types/react-router-dom": "^5.3.3",
     "googleapis": "^155.0.1",
     "lucide-react": "^0.539.0",
+    "netlify-cms-app": "^2.15.72",
+    "netlify-cms-core": "^2.73.0",
+    "netlify-cms-widget-markdown": "^2.12.3",
+    "netlify-cms-widget-image": "^2.17.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.8.1"

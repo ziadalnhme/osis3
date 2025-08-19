@@ -18,7 +18,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     },
     {
       id: '2',
-      name: 'م. فاطمة الزهراني',
+      name: 'م. فاطمة علي الزهراني',
       position: 'مدير التصميم',
       experience: '15 سنة خبرة',
       specialization: 'التصميم الإنشائي'

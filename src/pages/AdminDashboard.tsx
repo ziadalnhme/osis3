@@ -275,7 +275,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-lg">
         <div className="p-6 border-b">
-          <h1 className="text-xl font-bold text-gray-800">لوحة التحكم</h1>
+          <h1 className="text-xl font-bold text-gray-800">تسجيل الدخول</h1>
           <p className="text-sm text-gray-600 mt-1">
             مرحباً {getCurrentUser()?.username}
           </p>

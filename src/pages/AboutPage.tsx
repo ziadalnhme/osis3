@@ -17,7 +17,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       specialization: 'الهندسة المعمارية'
       images: [
         'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg'
-    },
+    ],
     {
       id: '2',
       name: 'م. جمال الزوم',

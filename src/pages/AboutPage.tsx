@@ -22,22 +22,24 @@ image: 'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg', // Add 
       name: 'م. جمال الزوم',
       position: 'مدير التصميم',
       experience: '7 سنة خبرة',
-      specialization: 'التصميم الإنشائي'
-    },
+      specialization: 'مهندس معماري',
+        image: 'https://i.postimg.cc/X7dxHYXb/1447-02-26-23-07-33-4c24f95f.jpg'
+    }, 
     {
       id: '3',
       name: 'م. عبدالفتاح',
       position: 'نزول ميداني',
       experience: '4 سنة خبرة',
-      specialization: 'مهندس إنشائي'
-    },
+      specialization: 'شراف هندسي',
+        image: 'https://i.postimg.cc/9M0qvJp9/418931780-2284735175058956-1577529066247557379-n.jpg'
+    }, 
     {
       id: '4',
-      name: 'م. رشاد',
+      name: 'م. رشاد الجعفري',
       position: 'مهندس معماري',
       experience: '4 سنة خبرة',
       specialization: 'التصميم الإنشائي',
-    image: 'https://i.postimg.cc/Dwgh8Qdm/image.jpg'
+    image: 'https://i.postimg.cc/x1VMcGfr/1447-02-26-23-07-33-38cfa1ed.jpg'
     }, 
   ];
 

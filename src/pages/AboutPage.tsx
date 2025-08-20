@@ -28,9 +28,9 @@ image: 'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg', // Add 
     {
       id: '3',
       name: 'م. عبدالفتاح',
-      position: 'نزول ميداني',
+      position: 'نشراف هندسي',
       experience: '4 سنة خبرة',
-      specialization: 'شراف هندسي',
+      specialization: 'مهندس إنشائي',
         image: 'https://i.postimg.cc/9M0qvJp9/418931780-2284735175058956-1577529066247557379-n.jpg'
     }, 
     {

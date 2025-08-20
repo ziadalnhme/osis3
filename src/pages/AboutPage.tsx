@@ -14,7 +14,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       name: 'م. حمزه الحميري',
       position: 'المدير العام',
       experience: '19 سنة خبرة',
-      specialization: 'الهندسة المعمارية'
+      specialization: 'الهندسة المعمارية',
       images: [
         'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg'
     },

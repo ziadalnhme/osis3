@@ -14,9 +14,10 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       name: 'م. حمزه الحميري',
       position: 'المدير العام',
       experience: '19 سنة خبرة',
-      specialization: 'الهندسة المعمارية'
-    image: 'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg'
-    },
+      specialization: 'الهندسة المعمارية',
+image: [
+  'https://i.postimg.cc/cL7jFsrz/1447-02-24-23-36-51-71b10d02.jpg'
+],
     {
       id: '2',
       name: 'م. جمال الزوم',
@@ -36,7 +37,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       name: 'م. رشاد',
       position: 'مهندس معماري',
       experience: '4 سنة خبرة',
-      specialization: 'التصميم الإنشائي'
+      specialization: 'التصميم الإنشائي',
     image: 'https://i.postimg.cc/Dwgh8Qdm/image.jpg'
     }, 
   ];

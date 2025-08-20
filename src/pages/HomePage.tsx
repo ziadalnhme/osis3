@@ -22,9 +22,9 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     backgroundImage: '',
     overlayOpacity: 40,
     gradientColors: {
-      from: 'from-blue-900',
-      via: 'via-blue-800',
-      to: 'to-blue-900'
+      from: 'from-blue-500',
+      via: 'via-blue-400',
+      to: 'to-blue-500'
     }
   });
   const [contentData, setContentData] = React.useState<ContentData | null>(null);
@@ -286,7 +286,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
   const engineeringImages = [
     'https://i.postimg.cc/bYMWdDK9/3.jpg',
-    'https://i.postimg.cc/J02DVVtV/24.jpg',
+    'https://i.postimg.cc/bYMWdDK9/3.jpg',
     'https://i.postimg.cc/5yT0KBkf/9.jpg',
     'https://i.postimg.cc/VLrY6bdc/6.jpg',
     'https://i.postimg.cc/YqFqqmsm/34.jpg'

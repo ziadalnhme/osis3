@@ -116,35 +116,35 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const supervisionCategories = [
     {
       id: 'towers',
-      title: 'أبراج إدارية',
+      title: 'أساسات شريطية',
       icon: Building,
       images: [
-        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/8z94wZQT/IMG-20250710-WA0112.jpg',
+        'https://i.postimg.cc/Z5Cjr1Qf/IMG-20250710-WA0115.jpg',
+        'https://i.postimg.cc/fbdKPYDm/IMG-20250710-WA0119.jpg',
+        'https://i.postimg.cc/tCr2nXBZ/IMG-20250710-WA0122.jpg'
       ]
     },
     {
       id: 'buildings',
-      title: 'عمائر سكنية',
+      title: 'تجهيــز الموقــع',
       icon: Home,
       images: [
-        'https://images.pexels.com/photos/280232/pexels-photo-280232.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1643383/pexels-photo-1643383.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/X7TBzmJ1/IMG-20250512-WA0014.jpg',
+        'https://i.postimg.cc/wTtsFg6s/IMG-20250628-WA0124.jpg',
+        'https://i.postimg.cc/J7YkbGWL/IMG-20250512-WA0018.jpg',
+        'https://i.postimg.cc/YCYLKRLr/IMG-20250628-WA0137.jpg'
       ]
     },
     {
       id: 'mosques',
-      title: 'مساجد',
+      title: 'ميــــــدة',
       icon: Award,
       images: [
-        'https://images.pexels.com/photos/2166711/pexels-photo-2166711.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/3862132/pexels-photo-3862132.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1267338/pexels-photo-1267338.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/2467558/pexels-photo-2467558.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://i.postimg.cc/fbWdcXkM/IMG-20250724-WA0138.jpg',
+        'https://i.postimg.cc/y8y93n1f/IMG-20250724-WA0137.jpg',
+        'https://i.postimg.cc/BvhKM61H/IMG-20250724-WA0141.jpg',
+        'https://i.postimg.cc/Qd31Mv39/IMG-20250724-WA0144.jpg'
       ]
     }
   ];

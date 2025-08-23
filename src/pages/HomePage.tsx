@@ -23,7 +23,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     overlayOpacity: 40,
     gradientColors: {
       from: 'from-blue-500',
-      via: 'via-blue-400',
+      via: 'via-blue-900',
       to: 'to-blue-500'
     }
   });

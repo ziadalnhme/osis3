@@ -71,9 +71,9 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <div className={`flex items-center ${language === 'en' ? 'space-x-3' : 'space-x-3 space-x-reverse'}`}>
                 <Phone className="h-4 w-4 text-blue-400" />
                 <div className="flex items-center space-x-2">
-                  <span className="text-gray-300">+966 55 929 9897</span>
+                  <span className="text-gray-300">+966 56 620 4146</span>
                   <a 
-                    href="https://wa.me/966559299897" 
+                    href="https://wa.me/966566204146" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-green-400 hover:text-green-300 transition-colors"
@@ -120,15 +120,15 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <span>{t('footer.designer')}</span>
               <div className="flex items-center gap-3">
                 <a 
-                  href="tel:+966547465459" 
+                  href="tel:+966566204146" 
                   className="flex items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors"
                   title={t('footer.call')}
                 >
                   <Phone className="h-4 w-4" />
-                  <span>+966 54 746 5459</span>
+                  <span>+966 566204146</span>
                 </a>
                 <a 
-                  href="https://wa.me/966547465459" 
+                  href="https://wa.me/966566204146" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-gray-400 hover:text-green-400 transition-colors"

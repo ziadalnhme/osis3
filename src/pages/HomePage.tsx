@@ -285,10 +285,10 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   }, []);
 
   const engineeringImages = [
-    'https://www.youtube.com/watch?v=QkvkbP_JNlg',
-    'https://www.youtube.com/watch?v=QkvkbP_JNlg',
-    'https://www.youtube.com/watch?v=QkvkbP_JNlg',
-    'https://www.youtube.com/watch?v=QkvkbP_JNlg',
+    'https://youtu.be/QkvkbP_JNlg?t=8',
+    'https://youtu.be/QkvkbP_JNlg?t=8',
+    'https://youtu.be/QkvkbP_JNlg',
+    'https://youtu.be/QkvkbP_JNlg?t=8',
     'https://www.youtube.com/watch?v=QkvkbP_JNlg'
   ];
 

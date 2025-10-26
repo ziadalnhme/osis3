@@ -20,7 +20,7 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [hasAnimated, setHasAnimated] = React.useState(false);
   const [heroSettings, setHeroSettings] = React.useState({
     backgroundImage: '',
-    overlayOpacity: 40,
+    overlayOpacity: 20,
     gradientColors: {
       from: 'from-blue-500',
       via: 'via-blue-900',
